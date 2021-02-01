@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gridone.scraping.mapper.NewsMonitoringMapper">
+  	
+  	<resultMap id="BaseResultMap" type="com.gridone.scraping.model.NewsMonitoring">
+  		<result column="MONITORING_ID" jdbcType="INTEGER" property="monitoringId" />
+  		<result column="KEYWORD_ID" jdbcType="INTEGER" property="keywordId" />
+  		<result column="TITLE" jdbcType="VARCHAR" property="title" />
+  		<result column="CONTENT" jdbcType="VARCHAR" property="content" />
+  		<result column="LINK" jdbcType="VARCHAR" property="link" />
+  		<result column="REGITDATE" jdbcType="TIMESTAMP" property="regitdate" />
+  		<result column="NEWSDATE" jdbcType="TIMESTAMP" property="newsdate" />
+  		<result column="PRESS" jdbcType="VARCHAR" property="press" />
+  		<result column="ENTERPRISE" jdbcType="VARCHAR" property="enterprise" />
+  		<result column="KEYWORDS" jdbcType="VARCHAR" property="keywords" />
+  	</resultMap>
+	
+	<insert id="insertNewsMonitoring" parameterType="com.gridone.scraping.model.NewsMonitoring">
+		insert into tb_monitoring_news (KEYWORD_ID, TITLE, CONTENT, LINK, NEWSDATE, PRESS)
+		values (#{keywordId}, #{title}, #{content}, #{link}, #{newsdate}, #{press})
+	</insert>
+	
+	<select id="selectByKeywordId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		SELECT *
+		FROM tb_monitoring_news n
+		WHERE n.KEYWORD_ID = #{keywordId}
+	</select>
+
+	<select id="getMonitoringNews" resultMap="BaseResultMap">
+		SELECT *
+		FROM tb_monitoring_news n left join tb_keywords k on n.KEYWORD_ID = k.ID
+		order by n.KEYWORD_ID
+	</select>
+	
+	<delete id="deleteAll">
+		delete from tb_monitoring_news
+	</delete>
+
+</mapper>

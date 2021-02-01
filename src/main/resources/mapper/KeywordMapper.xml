@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gridone.scraping.mapper.KeywordMapper">
+  	
+  	<resultMap id="BaseResultMap" type="com.gridone.scraping.model.Keyword">
+  		<result column="ID" jdbcType="INTEGER" property="id" />
+  		<result column="ENTERPRISE" jdbcType="VARCHAR" property="enterprise" />
+  		<result column="KEYWORDS" jdbcType="VARCHAR" property="keywords" />
+  	</resultMap>
+  
+	<select id="selectSearchList" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
+		SELECT ID, ENTERPRISE, KEYWORDS
+		FROM tb_keywords
+		WHERE ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		LIMIT #{firstIndex} , #{recordCountPerPage} 
+  	</select>
+  	
+	<select id="selectSearchListCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
+		SELECT count(*)
+		FROM tb_keywords
+		WHERE ENTERPRISE like CONCAT('%',#{searchVal},'%')
+  	</select>
+
+	<select id="selectAll" resultMap="BaseResultMap">
+		SELECT ID, ENTERPRISE, KEYWORDS
+		FROM tb_keywords
+	</select>
+	
+	<select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
+		SELECT ID, ENTERPRISE, KEYWORDS
+		FROM tb_keywords
+		WHERE ID = #{id}
+	</select>
+	
+	<insert id="addEnterprise" parameterType="com.gridone.scraping.model.Keyword">
+		insert into tb_keywords(ENTERPRISE, KEYWORDS)
+		values (#{enterprise}, #{keywords})
+	</insert>
+	
+	<update id="modifyEnterprise" parameterType="com.gridone.scraping.model.Keyword">
+		update tb_keywords
+		set ENTERPRISE = #{enterprise}, KEYWORDS = #{keywords}
+		where ID = #{id}
+	</update>
+	
+	<delete id="deleteEnterprise" parameterType="com.gridone.scraping.model.Keyword">
+		delete from tb_keywords
+		where ID = #{id}
+	</delete>
+
+</mapper>

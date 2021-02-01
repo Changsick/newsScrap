@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+
+	<div id="addEnterprise" th:fragment="addEnterprise" class="modal fade"
+		role="dialog" aria-labelledby="gridSystemModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="gridSystemModalLabel">기업 추가</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+					<form id="addForm">
+						<div class="row">
+							<div class="input-group">
+							  <span class="input-group-addon" id="basic-addon1">KeyWord : </span>
+							  <input type="text" class="form-control" name="keywords" id="addKeywords" value="RPA,업무자동화" placeholder=",단위로  구분됩니다.">
+							</div>
+						</div>
+						<div class="row" style="margin-top: 2%">
+							<div class="input-group">
+							  <span class="input-group-addon" id="basic-addon1">기업명 : </span>
+							  <input type="text" class="form-control" name="enterprise" id="addEnterpriseName">
+							</div>
+						</div>
+					</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="addSave">Save</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+	<!-- modify -->
+	<div id="modifySetting" th:fragment="modifySetting" class="modal fade"
+		role="dialog" aria-labelledby="gridSystemModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="gridSystemModalLabel">기업 수정</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<form id="modifyForm">
+						<div class="row">
+							<div class="input-group">
+							  <span class="input-group-addon" id="basic-addon1">KeyWord : </span>
+							  <input type="text" class="form-control" name="keywords" id="editKeywords" value="RPA,업무자동화" placeholder=",단위로  구분됩니다.">
+							</div>
+						</div>
+						<div class="row" style="margin-top: 2%">
+							<div class="input-group">
+							  <span class="input-group-addon" id="basic-addon1">기업명 : </span>
+							  <input type="text" class="form-control" name="enterprise" id="editEnterpriseName">
+							</div>
+						</div>
+						</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-danger" id="deleteSave" >Delete</button>
+					<button type="button" class="btn btn-primary" id="modifySave">Save</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+</body>
+</html>

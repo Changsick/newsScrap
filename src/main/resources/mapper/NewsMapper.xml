@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gridone.scraping.mapper.NewsMapper">
+  	
+  	<resultMap id="BaseResultMap" type="com.gridone.scraping.model.NewsData">
+  		<result column="NEWS_ID" jdbcType="INTEGER" property="newsId" />
+  		<result column="KEYWORD_ID" jdbcType="INTEGER" property="keywordId" />
+  		<result column="TITLE" jdbcType="VARCHAR" property="title" />
+  		<result column="CONTENT" jdbcType="VARCHAR" property="content" />
+  		<result column="LINK" jdbcType="VARCHAR" property="link" />
+  		<result column="REGITDATE" jdbcType="TIMESTAMP" property="regitdate" />
+  		<result column="NEWSDATE" jdbcType="TIMESTAMP" property="newsdate" />
+  		<result column="PRESS" jdbcType="VARCHAR" property="press" />
+  	</resultMap>
+  
+	<insert id="insertNews" parameterType="com.gridone.scraping.model.NewsData">
+		insert into tb_news (KEYWORD_ID, TITLE, CONTENT, LINK, NEWSDATE, PRESS)
+		values (#{keywordId}, #{title}, #{content}, #{link}, #{newsdate}, #{press})
+	</insert>
+	
+	<select id="newsList" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
+		SELECT NEWS_ID, KEYWORD_ID, TITLE, CONTENT, LINK, REGITDATE, NEWSDATE, PRESS
+		FROM tb_news
+		WHERE  1=1
+		<if test="keyword_id != null">
+			AND KEYWORD_ID = #{keyword_id}
+		</if>
+		<if test="searchVal != null and searchVal != ''">
+			AND TITLE like CONCAT('%',#{searchVal},'%')
+		</if>
+		LIMIT #{firstIndex} , #{recordCountPerPage}
+	</select>
+	
+	<select id="newsListCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
+		SELECT count(*)
+		FROM tb_news
+		WHERE  1=1
+		<if test="keyword_id != null">
+			AND KEYWORD_ID = #{keyword_id}
+		</if>
+		<if test="searchVal != null and searchVal != ''">
+			AND TITLE like CONCAT('%',#{searchVal},'%')
+		</if>
+	</select>
+	
+	<select id="getNewsByTitle" parameterType="com.gridone.scraping.model.NewsData" resultType="Integer">
+		SELECT count(*)
+		FROM tb_news
+		WHERE KEYWORD_ID = #{keywordId}
+		AND TITLE like CONCAT('%',#{title},'%')
+	</select>
+		<!-- WHERE TITLE = #{title} -->
+		
+	<delete id="deleteNewsByKeywordId" parameterType="com.gridone.scraping.model.Keyword">
+		delete from tb_news
+		where KEYWORD_ID = #{id}
+	</delete>
+
+</mapper>
