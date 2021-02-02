@@ -275,6 +275,24 @@
 		
 		dateSetting();
 		
+		$(document).keypress(function(event){
+			if(event.which == 13){
+				event.preventDefault();
+			}
+		});
+		
+		$("#enterpriseSearch").keypress(function(event){
+			if(event.which == 13){				
+				searchEnter();
+			}
+		});
+		
+		$("#titleSearch").keypress(function(event){
+			if(event.which == 13){				
+				newsList(1);
+			}
+		});
+		
 		$("#add").click(function(){
 			$("#addEnterprise").modal("show");
 		});
