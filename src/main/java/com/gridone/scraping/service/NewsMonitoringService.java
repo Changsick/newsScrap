@@ -67,7 +67,7 @@ public class NewsMonitoringService {
 					String item = keywordService.convertKeyword(k);
 					scrapNewsMonitoring(item, k, 3);
 					try {
-						Thread.sleep((int)(Math.random()*1000)+500);
+						Thread.sleep((int)(Math.random()*5000)+500);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
@@ -156,7 +156,7 @@ public class NewsMonitoringService {
 				errMonitoringList.add(errVal);
 			}else {				
 				try {
-					Thread.sleep((int)(Math.random()*1000)+500);
+					Thread.sleep((int)(Math.random()*5000)+500);
 					scrapNewsMonitoring(item, k, interval - 1);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
@@ -243,13 +243,13 @@ public class NewsMonitoringService {
 		if(titles != null && contents != null) {
 			StringProcessor title = new StringProcessor(titles);
 			StringProcessor content = new StringProcessor(contents);
+			resultData.put("titleImage", WordCloud.getImageWordCloud(title));
+			resultData.put("contentImage", WordCloud.getImageWordCloud(content));
+			
 			ArrayList<WordCount> titleWord = title.getTopFileWords();
 			ArrayList<WordCount> contentWord = content.getTopFileWords();
-
 			resultData.put("title", titleWord);
-			resultData.put("titleImage", WordCloud.getImageWordCloud(title));
 			resultData.put("content", contentWord);
-			resultData.put("contentImage", WordCloud.getImageWordCloud(content));
 
 		}
 		return resultData;

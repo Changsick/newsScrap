@@ -38,7 +38,7 @@ public class GridoneNewsController {
 //		keywordService.insertCsv();
 //		newsMonitoringService.isSimilaritySample();
 //		newsMonitoringService.executeNewsMonitoring();
-//		newsMonitoringService.monitoringSendEmail();
+		newsMonitoringService.monitoringSendEmail();
 		return "dailyNews";
 	}
 	
