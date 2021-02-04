@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.gridone.scraping.clusterAnalysis.ClusteringEngine;
 import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.ScrapAttribute;
 import com.gridone.scraping.model.SearchBase;
+import com.gridone.scraping.morpheme.MorphemeAnalysis;
 import com.gridone.scraping.service.KeywordService;
 import com.gridone.scraping.service.NewsMonitoringService;
 import com.gridone.scraping.service.NewsService;
@@ -38,7 +40,11 @@ public class GridoneNewsController {
 //		keywordService.insertCsv();
 //		newsMonitoringService.isSimilaritySample();
 //		newsMonitoringService.executeNewsMonitoring();
-		newsMonitoringService.monitoringSendEmail();
+//		newsMonitoringService.monitoringSendEmail();
+		MorphemeAnalysis ma = new MorphemeAnalysis();
+//		ma.analysisString();
+		ma.extractor();
+//		ClusteringEngine ce = new ClusteringEngine(10, 10, 10);
 		return "dailyNews";
 	}
 	
