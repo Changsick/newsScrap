@@ -241,15 +241,17 @@ public class NewsMonitoringService {
 		HashMap<String, Object> resultData = new HashMap<>();
 		
 		if(titles != null && contents != null) {
-			StringProcessor title = new StringProcessor(titles);
-			StringProcessor content = new StringProcessor(contents);
-			resultData.put("titleImage", WordCloud.getImageWordCloud(title));
+//			StringProcessor title = new StringProcessor(titles);
+			StringProcessor content = new StringProcessor(contents,null);
+//			resultData.put("titleImage", WordCloud.getImageWordCloud(title));
 			resultData.put("contentImage", WordCloud.getImageWordCloud(content));
 			
-			ArrayList<WordCount> titleWord = title.getTopFileWords();
+//			ArrayList<WordCount> titleWord = title.getTopFileWords();
 			ArrayList<WordCount> contentWord = content.getTopFileWords();
-			resultData.put("title", titleWord);
+			ArrayList<WordCount> contentLowerWord = content.getLowFileWords();
+//			resultData.put("title", titleWord);
 			resultData.put("content", contentWord);
+			resultData.put("contentLower", contentLowerWord);
 
 		}
 		return resultData;
@@ -331,48 +333,69 @@ public class NewsMonitoringService {
 		return sdf.format(date);
 	}
 	
-	public void sendEmail(List<SendMinigNews> sendEmailData) {
+	public void sendEmail(List<SendMinigNews> sendEmailData) {		
 		StringBuffer temp = new StringBuffer();
-		temp.append("<table class='table'>");
+		temp.append("<div class='container'>");
 		if(sendEmailData == null || sendEmailData.size() == 0) {
-			temp.append("<tr ><td colspan='2'> 데일리 모니터링의 소식이 없습니다. </td></tr>");
+			temp.append("<div class='header'> 모니터링의 소식이 없습니다. </div>");
 		}else {			
 			for (SendMinigNews item : sendEmailData) {
 //				for (Entry<String, ArrayList<WordCount>> entry  : item.getMiningText().entrySet()) {
 //					System.out.println("key : "+entry.getKey() + ", value : " + entry.getValue().toString());
 //				}
-				temp.append("<tr style='background-color: #FFC107;'><th colspan='2'>"+item.getEnterprise()+" 네이버 뉴스 </th></tr>");
-				temp.append("<tr><th style='width: 200px;'>제목</th><th>요약</th></tr>");
-
+				temp.append("<div class='header'> Keyword : "+item.getNewsList().get(0).getKeywords()+"</div>");
+				temp.append("<div class='content'>");
+				
+				temp.append("<div class='content_row' style='clear: both;display: block;'><table>");
+				
+				temp.append("<thead><tr>");				
+				temp.append("<th style='background-color: #FFC107;' colspan='3'>"+item.getEnterprise()+" 뉴스</th></tr>");
+				temp.append("<tr><th scope='col' style='width: 200px;'>제목</th><th scope='col'>요약</th><th scope='col' style='width: 100px;'>언론사</th>");
+				temp.append("</tr></thead>");
+				
+				temp.append("<tbody>");
 				for (NewsMonitoring item2 : item.getNewsList()) {
 					temp.append("<tr >");
 					temp.append("<td ><a href='"+item2.getLink()+"'>"+item2.getTitle()+"</a></td>");
 					temp.append("<td>"+item2.getContent()+"</td>");
+					temp.append("<td>"+item2.getPress()+"</td>");
 					temp.append("</tr>");
-				}					
+				}
+				temp.append("</tbody>");
+				temp.append("</table></div>"); // end content_row(table)
 				
-				temp.append("<tr >");
-				temp.append("<td>"+item.getMiningText().get("title").toString()+"</a></td>");
-				temp.append("<td>"+item.getMiningText().get("content").toString()+"</td>");
-				temp.append("</tr>");
+				temp.append("<div class='content_row elements' style='float:left;width:200px;'>");
+//				temp.append("");
+				temp.append("<ul><b>Top5</b><br>");
+				List<WordCount> list = (List<WordCount>)item.getMiningText().get("content");
+				for (WordCount w : list) {					
+					temp.append("<br><li>"+w.toString()+"</li>");
+				}
+				temp.append("</ul>");
+				temp.append("</div>"); // end content_row(elements)
+				temp.append("<div class='content_row elements' style='float:left;width:200px;'>");
+//				temp.append("<h3>Low5</h3>");
+				temp.append("<ul>Low5<br>");
+				List<WordCount> list2 = (List<WordCount>)item.getMiningText().get("contentLower");
+				for (WordCount w : list2) {					
+					temp.append("<br><li>"+w.toString()+"</li>");
+				}
+				temp.append("</ul>");
+				temp.append("</div>"); // end content_row(elements)
+
+				temp.append("<div class='content_row elements' style='float:left;'>");
+				temp.append("<ul>Word Cloud<br>");
+				temp.append("<img width='300px;' src='data:image/png;base64,"+item.getMiningText().get("contentImage")+"'>");
+				temp.append("</ul>");
+				temp.append("</div>"); // end content_row(elements)
 				
-				temp.append("<tr><td colspan='2'><b>제목 단어빈도</b></td></tr>");
-				temp.append("<tr>");
-				temp.append("<td colspan='2'>");
-				temp.append("<img width='500px;' src='data:image/png;base64,"+item.getMiningText().get("titleImage")+"'>");
-				temp.append("</td>");
-				temp.append("</tr>");
+				temp.append("<div class='footer' style='clear: both;'></div>");
 				
-				temp.append("<tr><td colspan='2'><b>요약 단어빈도</b></td></tr>");
-				temp.append("<tr>");
-				temp.append("<td colspan='2'>");
-				
-				temp.append("<img width='500px;' src='data:image/png;base64,"+item.getMiningText().get("contentImage")+"'>");
-				temp.append("</td>");
-				temp.append("</tr>");
+				temp.append("</div>"); // end content
 			}
 		}
-		temp.append("</table>");
+		temp.append("<div class='container'>");
 		mailClient.prepareAndSend(emailTo, temp.toString());
 	}
+	
 }

@@ -22,6 +22,8 @@ import com.gridone.scraping.service.KeywordService;
 import com.gridone.scraping.service.NewsMonitoringService;
 import com.gridone.scraping.service.NewsService;
 
+import kr.co.shineware.nlp.posta.en.core.EnPosta;
+
 @Controller
 @RequestMapping("/newsScraping")
 public class GridoneNewsController {
@@ -40,12 +42,36 @@ public class GridoneNewsController {
 //		keywordService.insertCsv();
 //		newsMonitoringService.isSimilaritySample();
 //		newsMonitoringService.executeNewsMonitoring();
-//		newsMonitoringService.monitoringSendEmail();
-		MorphemeAnalysis ma = new MorphemeAnalysis();
+		newsMonitoringService.monitoringSendEmail();
+//		MorphemeAnalysis ma = new MorphemeAnalysis();
 //		ma.analysisString();
-		ma.extractor();
+//		ma.extractor();
 //		ClusteringEngine ce = new ClusteringEngine(10, 10, 10);
+//		  EnPosta posta = new EnPosta();
+//
+//	       posta.load("model");
+//
+//	       //사용자 사전 추가
+//
+//	       posta.appendUserDic("dic.user");
+//
+//	       posta.buildFailLink();
+//
+//	      
+//
+//	       List<String> resultList = posta.analyze("Launch a new institute at the University of Washington to conduct independent, rigorous evaluations of health programs worldwide.");
+//
+//	       for (String result : resultList) {
+//
+//	             System.out.println(result);
+//
+//	       }
 		return "dailyNews";
+	}
+	
+	@RequestMapping("/test")
+	public String test(){
+		return "email2";
 	}
 	
 	@RequestMapping(value = "/enterpriseList.json", method = RequestMethod.POST)

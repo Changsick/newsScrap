@@ -16,7 +16,7 @@ public class ColorCombinations {
     private final Color[] scheme;
     
     public ColorCombinations(String[] colors) {
-        this(colors, Color.BLACK);
+        this(colors, Color.WHITE);
     }
     
     public ColorCombinations(String[] colors, Color background) {

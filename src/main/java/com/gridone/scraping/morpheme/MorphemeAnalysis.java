@@ -18,6 +18,31 @@ import com.gridone.scraping.wordcloud.WordCount;
 public class MorphemeAnalysis {
 	
 	private List<WordCount> wordList;
+	
+	private String thatString;
+	
+	public MorphemeAnalysis() {}
+	
+	public MorphemeAnalysis(String thatString) {
+		super();
+		this.thatString = thatString;
+	}
+	
+	public List<WordCount> getWordList() {
+		return wordList;
+	}
+
+	public void setWordList(List<WordCount> wordList) {
+		this.wordList = wordList;
+	}
+
+	public String getThatString() {
+		return thatString;
+	}
+
+	public void setThatString(String thatString) {
+		this.thatString = thatString;
+	}
 
 	public void analysisString() {
 		// string to analyze
@@ -61,7 +86,7 @@ public class MorphemeAnalysis {
 	
 	public void extractor() {
 		// string to extract keywords
-		String strToExtrtKwrd = "[패션뷰티 디지털혁신] 1위 도약한 LG생활건강, 디지털  GS칼텍스 내재화 나선다";
+		String strToExtrtKwrd = thatString;
 
 		// init KeywordExtractor
 		KeywordExtractor ke = new KeywordExtractor();
@@ -81,7 +106,7 @@ public class MorphemeAnalysis {
             WordCount wc = pq.poll(); // 첫번째 값을 반환하고 제거 비어있다면 null
             if (wc.word.length() > 1) wordList.add(wc);
         }
-		System.out.println("wordList : "+wordList);
+//		System.out.println("wordList : "+wordList);
 	}
 	
 }

@@ -110,8 +110,6 @@ public class CloudImageGenerator {
     	// 문자열을 보여주기 위해 필요한 총 너비를 계산하여 리턴 : Graphics2D에 적용된 폰트 크기만큼 영향을받아서 x좌표 계산하는데 음수가 나올 수 있어 요류가 발생할 수 있음 => 처리로직 추가필
         int strWidth = fm.stringWidth(word); 
         int strHeight = fm.getAscent(); // 기준선에서 글자 상단까지의 길이
-        System.out.println("strWidth : "+strWidth);
-        System.out.println("width : "+width);
         
         int x = rand.nextInt(width - strWidth); // 지정 width에서 지정표시 문자의 크기
         int y = rand.nextInt(height- strHeight) + strHeight;

@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 
 import org.springframework.core.io.ClassPathResource;
 
+import com.gridone.scraping.morpheme.MorphemeAnalysis;
+
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
@@ -34,7 +36,7 @@ public class StringProcessor implements Iterable<WordCount> {
 	public StringProcessor(String str, HashSet<String> filter) {
         this.str = str;
         this.filter = filter;
-        processString();
+        processMorphemeString();
     }
     
     public StringProcessor(String str) {
@@ -55,6 +57,12 @@ public class StringProcessor implements Iterable<WordCount> {
 			e.printStackTrace();
 		}
         processString();
+    }
+    
+    private void processMorphemeString() {
+    	MorphemeAnalysis ma = new MorphemeAnalysis(str);
+    	ma.extractor();
+    	words = (ArrayList<WordCount>) ma.getWordList();
     }
     
     private void processString() {
@@ -107,6 +115,17 @@ public class StringProcessor implements Iterable<WordCount> {
 			result = new ArrayList<WordCount>(words.subList(0, 5));
 		}else {
 			result = (ArrayList<WordCount>)words.clone();
+		}
+		return result;
+	}
+	
+	public ArrayList<WordCount> getLowFileWords() {
+		ArrayList<WordCount> result = (ArrayList<WordCount>)words.clone();
+		
+		Collections.reverse(words);
+		
+		if(result != null && result.size() > 5) {
+			result = new ArrayList<WordCount>(words.subList(0, 5));
 		}
 		return result;
 	}
