@@ -10,6 +10,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,6 +27,7 @@ import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.NewsData;
 import com.gridone.scraping.model.NewsMonitoring;
 import com.gridone.scraping.model.SendMinigNews;
+import com.gridone.scraping.morpheme.MorphemeAnalysis;
 import com.gridone.scraping.wordcloud.StringProcessor;
 import com.gridone.scraping.wordcloud.WordCloud;
 import com.gridone.scraping.wordcloud.WordCount;
@@ -55,6 +59,8 @@ public class NewsMonitoringService {
 	NewsMapper newsMapper;
 	
 	private List<Map<String, Object>> errMonitoringList = new ArrayList<>();
+	
+	private static int INTERVAL = 3;
 
 	public void executeNewsMonitoring() {
 		List<Keyword> keywords = keywordService.selectAll();
@@ -65,7 +71,7 @@ public class NewsMonitoringService {
 			forkjoinPool.submit(() -> {
 				keywords.parallelStream().forEach(k -> {
 					String item = keywordService.convertKeyword(k);
-					scrapNewsMonitoring(item, k, 3);
+					scrapNewsMonitoring(item, k, INTERVAL);
 					try {
 						Thread.sleep((int)(Math.random()*5000)+500);
 					} catch (InterruptedException e1) {
@@ -242,7 +248,8 @@ public class NewsMonitoringService {
 		
 		if(titles != null && contents != null) {
 //			StringProcessor title = new StringProcessor(titles);
-			StringProcessor content = new StringProcessor(contents,null);
+//			StringProcessor content = new StringProcessor(contents,null);
+			MorphemeAnalysis content = new MorphemeAnalysis(contents);
 //			resultData.put("titleImage", WordCloud.getImageWordCloud(title));
 			resultData.put("contentImage", WordCloud.getImageWordCloud(content));
 			
@@ -333,9 +340,15 @@ public class NewsMonitoringService {
 		return sdf.format(date);
 	}
 	
-	public void sendEmail(List<SendMinigNews> sendEmailData) {		
+	public void sendEmail(List<SendMinigNews> sendEmailData) {	
+		String container = "width: fit-content;";
+		String content = "position: relative;";
+		String content_row = "display: inline-block;max-width: 800px;max-height: 600px;overflow-y: auto;";
+		String elements = "float: left;";
+		
+		
 		StringBuffer temp = new StringBuffer();
-		temp.append("<div class='container'>");
+		temp.append("<div class='container' style='"+container+"'>");
 		if(sendEmailData == null || sendEmailData.size() == 0) {
 			temp.append("<div class='header'> 모니터링의 소식이 없습니다. </div>");
 		}else {			
@@ -344,9 +357,9 @@ public class NewsMonitoringService {
 //					System.out.println("key : "+entry.getKey() + ", value : " + entry.getValue().toString());
 //				}
 				temp.append("<div class='header'> Keyword : "+item.getNewsList().get(0).getKeywords()+"</div>");
-				temp.append("<div class='content'>");
+				temp.append("<div class='content' style='"+content+"'>");
 				
-				temp.append("<div class='content_row' style='clear: both;display: block;'><table>");
+				temp.append("<div class='content_row' style='"+content_row+"clear: both;display: block;'><table>");
 				
 				temp.append("<thead><tr>");				
 				temp.append("<th style='background-color: #FFC107;' colspan='3'>"+item.getEnterprise()+" 뉴스</th></tr>");
@@ -364,7 +377,7 @@ public class NewsMonitoringService {
 				temp.append("</tbody>");
 				temp.append("</table></div>"); // end content_row(table)
 				
-				temp.append("<div class='content_row elements' style='float:left;width:200px;'>");
+				temp.append("<div class='content_row elements' style='"+content_row+elements+"width:200px;'>");
 //				temp.append("");
 				temp.append("<ul><b>Top5</b><br>");
 				List<WordCount> list = (List<WordCount>)item.getMiningText().get("content");
@@ -373,7 +386,7 @@ public class NewsMonitoringService {
 				}
 				temp.append("</ul>");
 				temp.append("</div>"); // end content_row(elements)
-				temp.append("<div class='content_row elements' style='float:left;width:200px;'>");
+				temp.append("<div class='content_row elements' style='"+content_row+elements+"width:200px;'>");
 //				temp.append("<h3>Low5</h3>");
 				temp.append("<ul>Low5<br>");
 				List<WordCount> list2 = (List<WordCount>)item.getMiningText().get("contentLower");
@@ -383,7 +396,7 @@ public class NewsMonitoringService {
 				temp.append("</ul>");
 				temp.append("</div>"); // end content_row(elements)
 
-				temp.append("<div class='content_row elements' style='float:left;'>");
+				temp.append("<div class='content_row elements' style='"+content_row+elements+"'>");
 				temp.append("<ul>Word Cloud<br>");
 				temp.append("<img width='300px;' src='data:image/png;base64,"+item.getMiningText().get("contentImage")+"'>");
 				temp.append("</ul>");
@@ -394,8 +407,17 @@ public class NewsMonitoringService {
 				temp.append("</div>"); // end content
 			}
 		}
-		temp.append("<div class='container'>");
-		mailClient.prepareAndSend(emailTo, temp.toString());
+		temp.append("</div>");
+		String[] emails = emailTo.split(",");
+		InternetAddress[] toAddr = new InternetAddress[emails.length];
+		for(int i=0; i<emails.length; i++) {
+			try {
+				toAddr[i] = new InternetAddress(emails[i].trim());
+			} catch (AddressException e) {
+				e.printStackTrace();
+			}
+		}
+		mailClient.prepareAndSend(toAddr, temp.toString());
 	}
 	
 }

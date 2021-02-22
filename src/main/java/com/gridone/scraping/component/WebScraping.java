@@ -169,6 +169,6 @@ public class WebScraping {
 			}
 		}
 		temp.append("</table>");
-		mailClient.prepareAndSend(emailTo, temp.toString());
+//		mailClient.prepareAndSend(emailTo, temp.toString());
 	}
 }

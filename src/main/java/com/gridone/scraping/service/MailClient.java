@@ -1,5 +1,7 @@
 package com.gridone.scraping.service;
 
+import javax.mail.internet.InternetAddress;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,13 +29,13 @@ public class MailClient {
 		return templateEngine.process("email", context);
 	}
 	
-	public void prepareAndSend(String recipient, String message) {
+	public void prepareAndSend(InternetAddress[] recipient, String message) {
 		try {
 			MimeMessagePreparator messagePreparator = miemMessage -> {
 				MimeMessageHelper messageHelper = new MimeMessageHelper(miemMessage);
 				messageHelper.setFrom(emailFrom);
 				messageHelper.setTo(recipient);
-				messageHelper.setSubject("그리드원 데일리 뉴스 모니터링");
+				messageHelper.setSubject("그리드원 뉴스 모니터링");
 				String content = this.build(message);
 				content = content.replaceAll("&lt;", "<");
 				content = content.replaceAll("&gt;", ">");

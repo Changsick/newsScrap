@@ -39,15 +39,12 @@ public class GridoneNewsController {
 
 	@RequestMapping("/dailyNews")
 	public String dailyNews() {
-//		keywordService.insertCsv();
-//		newsMonitoringService.isSimilaritySample();
-//		newsMonitoringService.executeNewsMonitoring();
-		newsMonitoringService.monitoringSendEmail();
-//		MorphemeAnalysis ma = new MorphemeAnalysis();
-//		ma.analysisString();
-//		ma.extractor();
-//		ClusteringEngine ce = new ClusteringEngine(10, 10, 10);
-//		  EnPosta posta = new EnPosta();
+//		keywordService.insertCsv(); // 144번 vm과 같은 내용의 csv
+//		newsMonitoringService.isSimilaritySample(); // 유사도 테스트
+//		newsMonitoringService.executeNewsMonitoring(); // 모니터링 집계 테스트
+//		newsMonitoringService.monitoringSendEmail(); // 모니터링데이터 메일전송 테스트
+//		ClusteringEngine ce = new ClusteringEngine(10, 10, 10); // 군집 테스트,,,, 아 왜안됨
+//		  EnPosta posta = new EnPosta(); // 영어 형태소 테스트 중
 //
 //	       posta.load("model");
 //

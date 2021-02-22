@@ -1,6 +1,8 @@
 package com.gridone.scraping.morpheme;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Map.Entry;
@@ -15,9 +17,9 @@ import org.snu.ids.ha.ma.Sentence;
 import com.gridone.scraping.wordcloud.WordCount;
 
 // http://kkma.snu.ac.kr/documents/index.jsp
-public class MorphemeAnalysis {
+public class MorphemeAnalysis implements Iterable<WordCount> {
 	
-	private List<WordCount> wordList;
+	private ArrayList<WordCount> wordList;
 	
 	private String thatString;
 	
@@ -26,13 +28,14 @@ public class MorphemeAnalysis {
 	public MorphemeAnalysis(String thatString) {
 		super();
 		this.thatString = thatString;
+		extractor();
 	}
 	
 	public List<WordCount> getWordList() {
 		return wordList;
 	}
 
-	public void setWordList(List<WordCount> wordList) {
+	public void setWordList(ArrayList<WordCount> wordList) {
 		this.wordList = wordList;
 	}
 
@@ -98,7 +101,6 @@ public class MorphemeAnalysis {
 		PriorityQueue<WordCount> pq = new PriorityQueue<WordCount>(); 
 		for( int i = 0; i < kl.size(); i++ ) {
 			Keyword kwrd = kl.get(i);
-//			System.out.println(kwrd.getString() + "\t" + kwrd.getCnt());
 			pq.add(new WordCount(kwrd.getString(), kwrd.getCnt()));
 		}
 		wordList = new ArrayList<>();
@@ -106,7 +108,34 @@ public class MorphemeAnalysis {
             WordCount wc = pq.poll(); // 첫번째 값을 반환하고 제거 비어있다면 null
             if (wc.word.length() > 1) wordList.add(wc);
         }
-//		System.out.println("wordList : "+wordList);
+	}
+	
+	@Override
+	public Iterator<WordCount> iterator() {
+		// TODO Auto-generated method stub
+		return wordList.iterator();
+	}
+	
+	public ArrayList<WordCount> getTopFileWords() {
+		ArrayList<WordCount> result = null;
+		
+		if(wordList != null && wordList.size() > 5) {
+			result = new ArrayList<WordCount>(wordList.subList(0, 5));
+		}else {
+			result = (ArrayList<WordCount>)wordList.clone();
+		}
+		return result;
+	}
+	
+	public ArrayList<WordCount> getLowFileWords() {
+		ArrayList<WordCount> result = (ArrayList<WordCount>)wordList.clone();
+		
+		Collections.reverse(wordList);
+		
+		if(result != null && result.size() > 5) {
+			result = new ArrayList<WordCount>(wordList.subList(0, 5));
+		}
+		return result;
 	}
 	
 }

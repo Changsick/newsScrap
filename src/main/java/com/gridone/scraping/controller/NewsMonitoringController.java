@@ -23,13 +23,14 @@ public class NewsMonitoringController {
 	HashMap<Integer, HashMap<String, Object>> result = new HashMap<>();
 	
 //	@Scheduled(cron="0 0/5 * * * *")
-//	@Scheduled(cron="0 0 0/1 ? * *") 
+	@Scheduled(cron="0 0 0/1 ? * *") 
 	public void scrapMonitoringData() {
 		newsMonitoringService.executeNewsMonitoring();
 		System.err.println("######end");
 	}
 	
-	@Scheduled(cron="0 30 8 ? * *") 
+//	@Scheduled(cron="0 30 8 ? * *") 
+	@Scheduled(cron="0 30 8 ? * FRI") 
 	public void monitoringSendEmail() {
 		newsMonitoringService.monitoringSendEmail();
 	}
