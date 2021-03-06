@@ -8,7 +8,7 @@ import com.gridone.scraping.model.UserModel;
 @Mapper
 public interface UserMapper {
 
-	UserModel selectByLogin(String username);
+	UserModel selectByLogin(String email);
 
 	void insertUser(UserModel um);
 

@@ -2,6 +2,7 @@ package com.gridone.scraping.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import com.gridone.scraping.service.UserService;
 
 @EnableWebSecurity
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -65,13 +67,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		.httpStrictTransportSecurity().disable() // HTTPS Protocol 로만 접속하게 하지 않음(http도 지원)
         		.and()
                 .httpBasic().disable() // rest api 만을 고려하여 기본 설정은 해제하겠습니다.
-                .csrf().disable() // csrf 보안 토큰 disable처리. : 만들고 있는 서비스를 브라우저가 아닌 다른 클라이언트에서만 사용한다면 CSRF 방어를 비활성화해도 좋다
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 토큰 기반 인증이므로 세션 역시 사용하지 않습니다.
-//                .and()
+                .csrf().disable()
                 .authorizeRequests() // 요청에 대한 사용권한 체크
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
                 .antMatchers("/user/**").hasAuthority("USER")
-//        		.antMatchers("/**").authenticated()
+        		.antMatchers("/**").authenticated()
                 .antMatchers("/login","/join","/logout").permitAll()
                 .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
                 .and().formLogin()
@@ -90,11 +90,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 					.exceptionHandling()
 					.accessDeniedHandler(accessDeniedHandler()); // 인증실패 핸들링 : 여기서 각 경우에 따른 접근실패 페이지 설정이 가능하다. 따라서 
-//        			.accessDeniedPage("/login"); // 접근 실패 페이지 설정
-//	            .and()
-//                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-//                        UsernamePasswordAuthenticationFilter.class);
-                // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
         
         http.sessionManagement()
 		.sessionAuthenticationErrorUrl("/logout")

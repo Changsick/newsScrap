@@ -136,6 +136,47 @@
 	
 </style>
 
+<script th:inline="javascript">
+	var currParam = [[${param}]];
+/*<![CDATA[*/
+	
+	function onLogin(){
+		if(loginValidation()){			
+			$("#loginForm").submit();
+		}
+	}
+	
+	function loginValidation(){
+		var mailFormat = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+		var passwordFormat = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
+		
+		var email = $("input[name='email']").val();
+		var password = $("input[name='password']").val();
+		
+		if(!mailFormat.test(email)){	
+			if(email.length == 0){					
+				alert("이메일을 입력하세요.");
+			}else{				
+				alert("이메일 형식을 확인해주세요.");
+			}
+			$("input[name='email']").focus();
+			return false;
+		}
+		
+		if(!passwordFormat.test(password)){
+			alert("비밀번호는 8~16 자리까지 특수문자를 포함해야 합니다.");
+			$("input[name='password']").focus();
+			return false;				
+		}
+		return true;
+	}
+	
+	$(function(){
+		
+	})
+/*]]>*/
+</script>
+
 </head>
 
 <body>
@@ -144,19 +185,23 @@
 	<div class="container">
       <div class="wrapper">
         <div class="title"><span>로그인</span></div>
-        <form action="#">
+        <form th:action="@{/login}" method="post" id="loginForm">
           <div class="row">
             <i class="fas fa-at"></i>
-            <input type="text" placeholder="아이디" required>
+            <input type="text" placeholder="아이디" name="email" required>
           </div>
           <div class="row">
             <i class="fas fa-lock"></i>
-            <input type="password" placeholder="비밀번호" required>
+            <input type="password" placeholder="비밀번호" name="password" required>
           </div>
           <div class="row button">
-            <input type="submit" value="로그인">&nbsp;&nbsp;
+            <input type="button" value="로그인" onclick="onLogin()">&nbsp;&nbsp;
             <input type="button" value="회원가입" onclick = "location.href = 'register'">
           </div>
+          <div th:if="${param.error}" class="signup-link"><a style="text-decoration:none;color: red;">로그인 정보가 없습니다.</a></div>
+          <div th:if="${param.usererror}" class="signup-link"><a style="text-decoration:none;color: red;">비밀번호가 일치하지 않습니다.</a></div>
+          <div th:if="${param.lock}" class="signup-link"><a style="text-decoration:none;color: red;">5회 이상 로그인 실패로 계정이 잠겼습니다.</a></div>
+          <div th:if="${param.locked}" class="signup-link"><a style="text-decoration:none;color: red;">비활성화 상태입니다.</a></div>
           <div class="signup-link"><a href="#">비밀번호를 까먹었나요?</a></div>
         </form>
       </div>

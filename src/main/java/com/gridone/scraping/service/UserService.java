@@ -30,9 +30,9 @@ public class UserService implements UserDetailsService {
 	UserMapper userMapper;
 	
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserModel user = userMapper.selectByLogin(username);
-		
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		UserModel user = userMapper.selectByLogin(email);
+		System.err.println("username : "+email);
 		if(user == null) {
 			System.out.println("null");
 			throw new UsernameNotFoundException("login fail");
@@ -51,6 +51,7 @@ public class UserService implements UserDetailsService {
 			um.setPassword(passwordEncoder.encode(um.getPassword()));
 			um.setRole(EnumUserRole.USER);
 			um.setActive(EnumActive.ACTIVE);
+			um.setPasswordFailCnt(0);
 			userMapper.insertUser(um);
 			state_ok = 0;
 		} catch (Exception e) {
@@ -62,8 +63,8 @@ public class UserService implements UserDetailsService {
 		return result;
 	}
 	
-	public UserModel selectUser(String username) {
-		return userMapper.selectByLogin(username);
+	public UserModel selectUser(String email) {
+		return userMapper.selectByLogin(email);
 	}
 	
 	

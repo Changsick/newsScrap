@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `tb_user` (
   `PHONE` varchar(50) DEFAULT NULL COMMENT '휴대폰번호',
   `ACTIVE` tinyint(4) NOT NULL COMMENT '활성화플래그',
   `ROLE` smallint(6) NOT NULL COMMENT '권한Role',
-  `PASSWORD_FAIL_COUNT` int(10) unsigned zerofill DEFAULT NULL COMMENT '비밀번호실패횟수',
+  `PASSWORD_FAIL_COUNT` int(10) NOT NULL COMMENT '비밀번호실패횟수',
   `REGISTER_DATE` datetime DEFAULT current_timestamp() COMMENT '등록일',
   `PASSWORD_CHANGE` datetime DEFAULT NULL COMMENT '비밀번호 바꾼 날짜',
   PRIMARY KEY (`ID`)

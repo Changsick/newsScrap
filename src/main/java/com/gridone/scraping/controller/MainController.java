@@ -17,15 +17,20 @@ public class MainController {
 	public String login(HttpServletRequest request, HttpServletResponse response) {
 		Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
 		String destUri = request.getRequestURI();
-		if(authentication != null) {
+		if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
 			if(destUri.contains("login")) { // 인증된 사용자가 login 페이지 url을 요청할 경우 redirect
 				try {
-					response.sendRedirect(request.getContextPath()+"/ai");
+					response.sendRedirect(request.getContextPath()+"/dailyNews");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 		return "login";
+	}
+	
+	@GetMapping("/textmining")
+	public String textminingPage() {
+		return "textmining";
 	}
 }

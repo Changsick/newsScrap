@@ -18,7 +18,7 @@
   	<select id="selectByLogin" parameterType="java.lang.String" resultMap="BaseResultMap">
   		SELECT ID, EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, REGISTER_DATE, PASSWORD_CHANGE
 		FROM tb_user
-		WHERE EMAIL = #{username,jdbcType=VARCHAR}
+		WHERE EMAIL = #{email,jdbcType=VARCHAR}
   	</select>
   	
   	<insert id="insertUser" parameterType="com.gridone.scraping.model.UserModel">

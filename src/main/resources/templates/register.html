@@ -4,7 +4,7 @@
 <div th:replace="fragment/includes :: heads"></div>
 
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-
+<script th:src="@{/js/jquery.serialize-object.js}"></script>
 <style>
 	@font-face {
 	    font-family: 'NanumSquareRound';
@@ -136,6 +136,91 @@
 	
 </style>
 
+<script th:inline="javascript">
+	var currParam = [[${param}]];
+/*<![CDATA[*/
+
+	
+	function joinValidation(data){
+		
+		var mailFormat = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+		var passwordFormat = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
+		var phoneFormat = /^[0-9]{9,20}$/;
+		var nameFormat = /^\s*(?:\S\s*){1,30}$/;
+		
+		if(!mailFormat.test(data.email)){	
+			if(email.length == 0){					
+				alert("이메일을 입력하세요.");
+			}else{				
+				alert("이메일 형식을 확인해주세요.");
+			}
+			$("input[name='email']").focus();
+			return false;
+		}
+		
+		if(!passwordFormat.test(data.password)){
+			alert("비밀번호는 8~16 자리까지 특수문자를 포함해야 합니다.");
+			$("input[name='password']").focus();
+			return false;				
+		}
+		
+		if(data.name.length == 0){
+			alert("이름을 입력해주세요.");
+			$("input[name='name']").focus();
+			return false;
+		}
+		
+		if(data.passwordCheck != data.password){
+			alert("비밀번호와 일치하지 않습니다.");
+			$("input[name='passwordCheck']").focus();
+			return false;
+		}
+		if(!phoneFormat.test(data.phone)){
+			alert("휴대폰 번호는 9~20자리까지 숫자만 입력 가능합니다.");						
+			$("input[name='phone']").focus();
+			return false;
+		}
+		if(!nameFormat.test(data.name)){
+			alert("이름은 1 ~ 30자까지 입력 가능합니다.");
+			$("input[name='name']").focus();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	function onJoin(){
+		var data = $("#joinForm").serializeObject();
+		if(joinValidation(data)){
+			$.ajax({
+				type : "post",
+				url : [[@{|/join|}]],
+				data : JSON.stringify(data),
+				dataType : "JSON",
+				contentType : "application/json",
+				success : function(res){
+					if(res.state_ok == 0){
+						alert('가입완료');
+						location.href="login";
+					}else{					
+						alert(res.msg);
+					}
+				},
+				error: function (xhr, status, err) {
+					console.log(xhr);
+					console.log(status);
+					console.log(err);
+				}
+			});
+		}
+	}
+	
+	$(function(){
+		
+	})
+/*]]>*/
+</script>
+
 </head>
 
 <body>
@@ -144,29 +229,29 @@
 	<div class="container">
       <div class="wrapper">
         <div class="title"><span>회원가입</span></div>
-        <form action="#">
+        <form action="#" id="joinForm">
           <div class="row">
             <i class="fas fa-at"></i>
-            <input type="text" placeholder="아이디" required>
+            <input type="text" name="email" placeholder="아이디" required>
           </div>
           <div class="row">
             <i class="fas fa-lock"></i>
-            <input type="password" placeholder="비밀번호" required>
+            <input type="password" name="password" placeholder="비밀번호" required>
           </div>
           <div class="row">
             <i class="fas fa-lock"></i>
-            <input type="password" placeholder="비밀번호 확인" required>
+            <input type="password" name="passwordCheck" placeholder="비밀번호 확인" required>
           </div>
           <div class="row">
             <i class="fas fa-user"></i>
-            <input type="text" placeholder="이름" required>
+            <input type="text" name="name" placeholder="이름" required>
           </div>
           <div class="row">
             <i class="fas fa-mobile-alt"></i>
-            <input type="text" placeholder="전화번호" required>
+            <input type="text" name="phone" placeholder="전화번호" required>
           </div>
           <div class="row button">
-            <input type="submit" value="가입">
+            <input type="button" value="가입" onclick="onJoin();">
           </div>
         </form>
       </div>
