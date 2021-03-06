@@ -5,17 +5,63 @@
 
 </head>
 <style>
-#headRow {
-	margin: 0;
-	padding: 10px 30px;
-	background-color: #f7f7f7;
-	/* background-image: linear-gradient(45deg, #336688, #336688 25%, transparent 25%, transparent 50%, #336688 75%, transparent); */
-	background-image: linear-gradient(45deg, #336688, #ffffff);
-	background-size: 100%;
-	height: 100px;
-	display: flex;
-	align-items: center;
-}
+@font-face {
+	    font-family: 'NanumSquareRound';
+	    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+	
+	*{
+		font-family: 'NanumSquareRound';
+	}
+
+	#headRow {
+		margin: 0;
+		padding: 10px 30px;
+		background-size: 100%;
+		height: 100px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	#footRow {
+		text-align: center;
+		border-top: 2px solid gray;
+		bottom: 0;
+		margin: 0;
+		padding: 10px;
+		width: 100%;
+		height: 100px;
+		position: absolute;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	#footRow p{
+		margin: 0;
+	}
+	
+	.row{
+		margin: 0;	
+	}
+	
+	.buttons{
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 20px;
+	}
+	
+	.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
+		background-color: #4ca0cc;	
+	}
+	
+	.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover{
+		background-color: #4ca0cc;
+		border-color: #4ca0cc;
+	}
+	
 /* .active-cyan-2 input.form-control[type=text]:focus:not([readonly]) {
   border-bottom: 1px solid #4dd0e1;
   box-shadow: 0 1px 0 0 #4dd0e1;
@@ -384,8 +430,14 @@
 <body>
 	<div id="header" th:include="fragment/header :: header"></div>
 	
-	<div class="row" style="margin-top: 5%">
+	<div class="row">
 		<div class="col-md-3" style="padding-left: 5%; vertical-align: middle;">
+			<div class="buttons">
+				<button>키워드<br>입력</button>
+				<button>스크랩<br>시작</button>
+				<button>메일<br>발송</button>
+				<button>스크랩 키워드<br>일괄 삭제</button>
+			</div>
 			<div>
 				<input type="date" id="startDate" name="startDate"> ~ 
 				<input type="date" id="endDate" name="endDate">
@@ -417,7 +469,8 @@
 			</div>
 		</div>
 		
-		<div class="col-md-9" align="right" style="padding-right: 5%;margin-top: 2%;">
+		<div class="col-md-9" align="right" style="padding-right: 5%; margin-top: 2%;">
+		<div style="padding: 10px 0px;"><button>데이터 일괄 삭제</button></div>
 			<form class="form-inline d-flex justify-content-center md-form form-sm active-cyan-2 mt-2" name="searchTitle" id="searchTitle">
 				<input type="hidden" id="currEnter" name="enterprise">
 				<div class="input-group" style="width: 70%;">
@@ -429,7 +482,7 @@
 				    <!-- &nbsp;<span class="glyphicon glyphicon-search" aria-hidden="true" style="cursor: pointer;"></span> -->
 			    </div>
 			</form>
-			<div style="margin-top: 2%;height: 600px;overflow-y: auto;">
+			<div style="margin-top: 2%;height: 450px;overflow-y: auto;">
 			<table class="table" style="">
 			  <thead>
 			    <tr>
@@ -483,5 +536,7 @@
 	<div th:replace="fragment/modal :: addEnterprise"></div>
 	<div th:replace="fragment/modal :: modifySetting"></div>
 	
+	<div id="footer" th:include="fragment/footer :: footer"></div>
+	
 </body>
-</hmtl>
+</html>
