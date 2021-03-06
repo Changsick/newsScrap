@@ -4,12 +4,13 @@
   	
   	<resultMap id="BaseResultMap" type="com.gridone.scraping.model.Keyword">
   		<result column="ID" jdbcType="INTEGER" property="id" />
+  		<result column="USERID" jdbcType="INTEGER" property="userId" />
   		<result column="ENTERPRISE" jdbcType="VARCHAR" property="enterprise" />
   		<result column="KEYWORDS" jdbcType="VARCHAR" property="keywords" />
   	</resultMap>
   
 	<select id="selectSearchList" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
-		SELECT ID, ENTERPRISE, KEYWORDS
+		SELECT ID, USERID, ENTERPRISE, KEYWORDS
 		FROM tb_keywords
 		WHERE ENTERPRISE like CONCAT('%',#{searchVal},'%')
 		LIMIT #{firstIndex} , #{recordCountPerPage} 
@@ -22,19 +23,19 @@
   	</select>
 
 	<select id="selectAll" resultMap="BaseResultMap">
-		SELECT ID, ENTERPRISE, KEYWORDS
+		SELECT ID, USERID, ENTERPRISE, KEYWORDS
 		FROM tb_keywords
 	</select>
 	
 	<select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
-		SELECT ID, ENTERPRISE, KEYWORDS
+		SELECT ID, USERID, ENTERPRISE, KEYWORDS
 		FROM tb_keywords
 		WHERE ID = #{id}
 	</select>
 	
 	<insert id="addEnterprise" parameterType="com.gridone.scraping.model.Keyword">
-		insert into tb_keywords(ENTERPRISE, KEYWORDS)
-		values (#{enterprise}, #{keywords})
+		insert into tb_keywords(USERID, ENTERPRISE, KEYWORDS)
+		values (#{userId}, #{enterprise}, #{keywords})
 	</insert>
 	
 	<update id="modifyEnterprise" parameterType="com.gridone.scraping.model.Keyword">

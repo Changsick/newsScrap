@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +27,6 @@ import com.gridone.scraping.service.NewsService;
 import kr.co.shineware.nlp.posta.en.core.EnPosta;
 
 @Controller
-@RequestMapping("/newsScraping")
 public class GridoneNewsController {
 	
 	@Autowired
@@ -39,6 +40,8 @@ public class GridoneNewsController {
 
 	@RequestMapping("/dailyNews")
 	public String dailyNews() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		System.out.println(auth.getPrincipal());
 //		keywordService.insertCsv(); // 144번 vm과 같은 내용의 csv
 //		newsMonitoringService.isSimilaritySample(); // 유사도 테스트
 //		newsMonitoringService.executeNewsMonitoring(); // 모니터링 집계 테스트

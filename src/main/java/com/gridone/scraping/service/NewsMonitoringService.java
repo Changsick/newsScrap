@@ -417,6 +417,7 @@ public class NewsMonitoringService {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("temp : "+temp.toString());
 		mailClient.prepareAndSend(toAddr, temp.toString());
 	}
 	

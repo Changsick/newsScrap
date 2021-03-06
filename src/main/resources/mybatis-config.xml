@@ -10,5 +10,6 @@
     	<mapper resource="mapper/KeywordMapper.xml"/>
     	<mapper resource="mapper/NewsMapper.xml"/>
     	<mapper resource="mapper/NewsMonitoringMapper.xml"/>
+    	<mapper resource="mapper/UserMapper.xml"/>
     </mappers>
 </configuration>

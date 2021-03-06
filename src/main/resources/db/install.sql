@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS `dailynews`;
+CREATE DATABASE IF NOT EXISTS `dailynews` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `dailynews`;

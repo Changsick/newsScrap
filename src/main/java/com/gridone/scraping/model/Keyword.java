@@ -3,6 +3,7 @@ package com.gridone.scraping.model;
 public class Keyword {
 	
 	private Integer id;
+	private Integer userId;
 	private String enterprise;
 	private String keywords;
 	
@@ -24,9 +25,12 @@ public class Keyword {
 	public void setKeywords(String keywords) {
 		this.keywords = keywords;
 	}
-	@Override
-	public String toString() {
-		return "Keyword [id=" + id + ", enterprise=" + enterprise + ", keywords=" + keywords + "]";
+	public Integer getUserId() {
+		return userId;
 	}
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+	
 
 }

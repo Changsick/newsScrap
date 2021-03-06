@@ -95,8 +95,8 @@
 
 <script th:inline="javascript">
 	/*<![CDATA[*/
-	var enterpriseListUrl = [[@{|/newsScraping/enterpriseList.json|}]];
-	var newsListUrl = [[@{|/newsScraping/newsList.json|}]];
+	var enterpriseListUrl = [[@{|/enterpriseList.json|}]];
+	var newsListUrl = [[@{|/newsList.json|}]];
 	var enterPage = 1;
 	var enterPageData;
 	
@@ -186,7 +186,7 @@
 	}
 	
 	function bindEditModal(){
-		var url = [[@{|/newsScraping/getEnterprise.json|}]];
+		var url = [[@{|/getEnterprise.json|}]];
 		var param = {
 			id : $("#currEnter").val()
 		};
@@ -207,7 +207,7 @@
 		alert("\""+$("#"+$("#currEnter").val()).children().text()+"\" 에 대한 키워드로 스크랩합니다."+"\n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
 		var keyId = $("#enterpriseList").find("li[class='active']").attr("id");
 		if(keyId != null && keyId != undefined){
-			var url = [[@{|/newsScraping/certainNewsInsert|}]];
+			var url = [[@{|/certainNewsInsert|}]];
 			var data = {
 				id : keyId,
 				startDate : $("#startDate").val(),
@@ -233,7 +233,7 @@
 	
 	function allNewsInsert(){
 		alert("전체회사에 대한 키워드로 스크랩합니다. \n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
-		var url = [[@{|/newsScraping/allNewsInsert|}]];
+		var url = [[@{|/allNewsInsert|}]];
 		var data = {
 			startDate : $("#startDate").val(),
 			endDate : $("#endDate").val()
@@ -324,7 +324,7 @@
 		$("#addSave").click(function(){
 			var form = document.getElementById("addForm");
 			var data = $("form#addForm").serializeObject();
-			var url = [[@{|/newsScraping/addEnterprise.json|}]];
+			var url = [[@{|/addEnterprise.json|}]];
 			var result = $.post(url, data);
 			result.done(function(data) {
 				alert("저장되었습니다.");
@@ -344,7 +344,7 @@
 			var form = document.getElementById("modifyForm");
 			var data = $("form#modifyForm").serializeObject();
 			data.id = $("#currEnter").val();
-			var url = [[@{|/newsScraping/modifyEnterprise.json|}]];
+			var url = [[@{|/modifyEnterprise.json|}]];
 			var result = $.post(url, data);
 			result.done(function(data) {
 				alert("저장되었습니다.");
@@ -363,7 +363,7 @@
 			var form = document.getElementById("modifyForm");
 			var data = $("form#modifyForm").serializeObject();
 			data.id = $("#currEnter").val();
-			var url = [[@{|/newsScraping/deleteEnterprise.json|}]];
+			var url = [[@{|/deleteEnterprise.json|}]];
 			var result = $.post(url, data);
 			result.done(function(data) {
 				alert("삭제되었습니다.");

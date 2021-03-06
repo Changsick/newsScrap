@@ -13,11 +13,14 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.KeywordMapper;
 import com.gridone.scraping.mapper.NewsMapper;
 import com.gridone.scraping.model.Keyword;
+import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.SearchBase;
 
@@ -64,8 +67,18 @@ public class KeywordService {
 
 	public Map<String, Object> addEnterprise(Keyword param) {
 		Map<String, Object> resultVal = new HashMap<>();
-		boolean result = true;
-		Integer insert = keywordMapper.addEnterprise(param);
+		boolean result = false;
+		try {			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if(!auth.getPrincipal().equals("anonymousUser")) {				
+				LoginUserDetails userDetails = (LoginUserDetails) auth.getPrincipal();
+				param.setUserId(userDetails.getId());
+				Integer insert = keywordMapper.addEnterprise(param);
+				result = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();			
+		}
 		resultVal.put("result", result);
 		return resultVal;
 	}

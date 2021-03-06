@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gridone.scraping.mapper.UserMapper">
+	
+	<resultMap type="com.gridone.scraping.model.UserModel" id="BaseResultMap">
+		<id column="ID" jdbcType="INTEGER" property="id" />
+		<result column="EMAIL" jdbcType="VARCHAR" property="email" />
+		<result column="PASSWORD" jdbcType="VARCHAR" property="password" />		
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="PHONE" jdbcType="VARCHAR" property="phone" />
+		<result column="ACTIVE" jdbcType="TINYINT" property="active" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+		<result column="ROLE" jdbcType="TINYINT" property="role" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+		<result column="PASSWORD_FAIL_COUNT" jdbcType="TINYINT" property="passwordFailCnt" />		
+		<result column="REGISTER_DATE" jdbcType="TIMESTAMP" property="regDt" />
+		<result column="PASSWORD_CHANGE" jdbcType="TIMESTAMP" property="changeDt" />		
+	</resultMap>
+  	
+  	<select id="selectByLogin" parameterType="java.lang.String" resultMap="BaseResultMap">
+  		SELECT ID, EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, REGISTER_DATE, PASSWORD_CHANGE
+		FROM tb_user
+		WHERE EMAIL = #{username,jdbcType=VARCHAR}
+  	</select>
+  	
+  	<insert id="insertUser" parameterType="com.gridone.scraping.model.UserModel">
+  		insert into tb_user (EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, PASSWORD_CHANGE)
+  		values(
+  			#{email}, #{password}, #{name}, #{phone}, #{active,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, 
+  			#{role,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},#{passwordFailCnt}, #{changeDt}
+  		)
+  	</insert>
+</mapper>
