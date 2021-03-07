@@ -40,5 +40,27 @@
 		delete from tb_monitoring_news
 		where KEYWORD_ID = #{id}
 	</delete>
+	
+	<select id="newsList" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
+		SELECT MONITORING_ID, KEYWORD_ID, TITLE, CONTENT, LINK, REGITDATE, NEWSDATE, PRESS
+		FROM tb_monitoring_news
+		WHERE  KEYWORD_ID = #{keyword_id}
+		
+		<if test="searchVal != null and searchVal != ''">
+			AND TITLE like CONCAT('%',#{searchVal},'%')
+		</if>
+		order by NEWSDATE desc
+		LIMIT #{firstIndex} , #{recordCountPerPage}
+	</select>
+	
+	<select id="newsListCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
+		SELECT count(*)
+		FROM tb_monitoring_news
+		WHERE  KEYWORD_ID = #{keyword_id}
+		
+		<if test="searchVal != null and searchVal != ''">
+			AND TITLE like CONCAT('%',#{searchVal},'%')
+		</if>
+	</select>
 
 </mapper>

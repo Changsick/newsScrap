@@ -87,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.permitAll()
 				.and()
 					.exceptionHandling()
-					.accessDeniedHandler(accessDeniedHandler()); // 인증실패 핸들링 : 여기서 각 경우에 따른 접근실패 페이지 설정이 가능하다. 따라서 
+					.accessDeniedHandler(accessDeniedHandler()); // 인증실패 핸들링 : 여기서 각 경우에 따른 접근실패 페이지 설정이 가능하다. 따라서
         
         http.sessionManagement()
 		.sessionAuthenticationErrorUrl("/logout")

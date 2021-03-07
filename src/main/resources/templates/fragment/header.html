@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.springframework.org/security/tags">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
 <head>
 <meta charset="UTF-8" th:remove="tag">
 </head>
@@ -18,12 +17,14 @@
 		<div class="row" id="headRow" style="background-image: none; background-color: #ffffff;">
 			<a th:href="@{|/main|}" style="text-decoration: none;color: white;"><img class="logo" th:src="@{/images/logo.png}" alt="logo" style="width: 240px; height: 45px;"/></a>
 		</div>
-		<div sec:authorize="hasRole('USER')" style="float: right;">
-			<span style="position: relative;">
-				<span class="glyphicon glyphicon-user" aria-hidden="true"  title="현재 뉴스 스크랩" id="userArea" sec:authentication="name"></span>
-			</span>
-			<a th:href="@{|/logout|}">logout</a>
-		</div>
+		<sec:authorize access="isAuthenticated()">
+			<div style="float: right;">
+				<span style="position: relative;">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"  title="현재 뉴스 스크랩" id="userArea" sec:authentication="name"></span>
+				</span>
+				<a th:href="@{|/logout|}">logout</a>
+			</div>
+		</sec:authorize>
 	</div>
 </body>
 </html>

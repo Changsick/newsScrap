@@ -206,7 +206,7 @@
 <script th:inline="javascript">
 	/*<![CDATA[*/
 	var enterpriseListUrl = [[@{|/enterpriseList.json|}]];
-	var newsListUrl = [[@{|/newsList.json|}]];
+	var newsListUrl = [[@{|/monitoringNewsList.json|}]];
 	var enterPage = 1;
 	var enterPageData;
 	
@@ -289,10 +289,10 @@
 	    bindEditModal();
 	}
 	
-	function makeButton(){
+	function makeButton(){		
 		var button = "<div class='buttons_2 btnDiv'>"
-			+ "<button onclick='modifyClick(event)' style='width:fit-content;'>수정</button>"
-			+ "<button onclick='deleteKeyword(event)' style='width:fit-content;'>삭제</button></div>";
+		+ "<button onclick='modifyClick(event)' style='width:fit-content;'>수정</button>"
+		+ "<button onclick='deleteKeyword(event)' style='width:fit-content;'>삭제</button></div>";
 		return button;
 	}
 	
@@ -369,15 +369,14 @@
 	}
 	
 	function allNewsInsert(){
-		alert("전체 키워드로 스크랩합니다. \n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
-		var url = [[@{|/allNewsInsert|}]];
-		var data = {
-			startDate : $("#startDate").val(),
-			endDate : $("#endDate").val()
-		};
-		var result = $.post(url, data);
+		alert("전체 키워드로 스크랩합니다. 시간이 다소 소요될 수 있습니다.");
+		var url = [[@{|/monitoringScrap.json|}]];
+// 		var data = {
+// 			startDate : $("#startDate").val(),
+// 			endDate : $("#endDate").val()
+// 		};
+		var result = $.post(url);
 		result.done(function(data) {
-			console.log('allNewsInsert data',data);
 			if(data.result){
 				alert("스크랩 완료");
 				newsList(1);
@@ -450,7 +449,7 @@
 	}
 	
 	function getScrapStatus(){
-		var url = [[@{|/checkScrapStatus|}]];
+		var url = [[@{|/checkMonitoringScrapStatus|}]];
 		
 		var result = $.post(url);
 		result.done(function(data) {
@@ -474,7 +473,7 @@
 		var form = document.getElementById("modifyForm");
 		var data = $("form#modifyForm").serializeObject();
 		data.id = $("#currEnter").val();
-		var url = [[@{|/deleteNewsByKeyword.json|}]];
+		var url = [[@{|/deleteMonitoringNewsByKeyword.json|}]];
 		var result = $.post(url, data);
 		result.done(function(data) {
 			alert("삭제되었습니다.");
@@ -486,28 +485,6 @@
 	    });
 		
 		form.reset();
-	}
-	
-	function sendMail(){
-		var url = [[@{|/sendMail|}]];
-		var data = {
-			startDate : $("#startDate").val(),
-			endDate : $("#endDate").val()
-		};
-		alert(data.startDate + " 부터" + data.endDate + "까지 뉴스데이터를 발송합니다.\n기간과 데이터 양에 따라 시간이 다소 소요될 수 있습니다.");
-		var result = $.post(url, data);
-		result.done(function(data) {
-			alert('완료');
-// 			if(data.result){
-				
-// 			}else{
-// 				alert("실패");
-// 			}
-	    });
-		result.fail(function(xhr, status, error) {
-			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
-			alert("fail");
-	    });
 	}
 	
 	var timerId = null;
@@ -639,12 +616,12 @@
 	<div id="header" th:include="fragment/header :: header"></div>
 	
 	<div class="row">
-		<div class="col-md-3" style="padding-left: 5%; vertical-align: middle;">
+		<div class="col-md-3" style="padding-left: 5%; vertical-align: middle;margin-top: 3%;">
 			<div class="buttons_2">
 				<button id="add">키워드<br>입력</button>
 				<button onclick="allNewsInsert()">스크랩<br>시작</button>
-				<button onclick="sendMail()">메일<br>발송</button>
 				<button onclick="deleteAll()">키워드<br>일괄 삭제</button>
+				<button >메일 발송<br>시간 입력</button>
 			</div>
 			<!-- <div class="buttons_2">
 				<button onclick="certainNewsInsert()">현재 뉴스<br>스크랩</button>
@@ -653,9 +630,9 @@
 				<button id="modify">기업<br>수정</button>
 			</div> -->
 			<div class="setDate" style="display: flex;">
-				<input type="date" id="startDate" name="startDate">
+				<!-- <input type="date" id="startDate" name="startDate">
 				<label style="line-height: 40px; font-weight: bold; padding: 3px;">~</label>
-				<input type="date" id="endDate" name="endDate">
+				<input type="date" id="endDate" name="endDate"> -->
 			</div>
 			<div id="scrapStatusView" style="display:none;position: relative;">
 				&nbsp;&nbsp;<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" style="color: red;" title="현재 뉴스 스크랩">스크랩중</span>
@@ -711,31 +688,7 @@
 			<div id="newsPage" align="center"> 
 				<nav>
 				  <ul class="pagination">
-				    <!-- <li>
-				      <a href="#" aria-label="PreviousStart">
-				        <span aria-hidden="true">&laquo;</span>
-				      </a>
-				    </li>
-				    <li>
-				      <a href="#" aria-label="Previous">
-				        <span aria-hidden="true">&lt;</span>
-				      </a>
-				    </li>
-				    <li class="active"><a>1</a></li>
-				    <li><a href="#">2</a></li>
-				    <li><a href="#">3</a></li>
-				    <li><a href="#">4</a></li>
-				    <li><a href="#">5</a></li>
-				    <li>
-				      <a href="#" aria-label="Next">
-				        <span aria-hidden="true">&gt;</span>
-				      </a>
-				    </li>
-				    <li>
-				      <a href="#" aria-label="NextEnd">
-				        <span aria-hidden="true">&raquo;</span>
-				      </a>
-				    </li> -->
+				    
 				  </ul>
 				</nav>
 			</div>

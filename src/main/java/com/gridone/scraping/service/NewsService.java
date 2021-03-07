@@ -418,7 +418,7 @@ public class NewsService {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("temp : "+temp.toString());
+//		System.out.println("temp : "+temp.toString());
 		mailClient.prepareAndSend(toAddr, temp.toString());
 	}
 

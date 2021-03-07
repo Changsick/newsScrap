@@ -28,4 +28,10 @@
   			#{role,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},#{passwordFailCnt}, #{changeDt}
   		)
   	</insert>
+  	
+  	<select id="getAllAdmins" resultMap="BaseResultMap">
+  		SELECT ID, EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, REGISTER_DATE, PASSWORD_CHANGE
+		FROM tb_user
+		WHERE ROLE = 0
+  	</select>
 </mapper>

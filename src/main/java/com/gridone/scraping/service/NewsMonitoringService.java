@@ -19,14 +19,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.NewsMapper;
-import com.gridone.scraping.mapper.NewsMonitoringMapper;
+import com.gridone.scraping.mapper.NewsMonitoringMapper;import com.gridone.scraping.mapper.UserMapper;
 import com.gridone.scraping.model.Keyword;
+import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.model.NewsData;
 import com.gridone.scraping.model.NewsMonitoring;
+import com.gridone.scraping.model.ResultList;
+import com.gridone.scraping.model.SearchBase;
 import com.gridone.scraping.model.SendMinigNews;
+import com.gridone.scraping.model.UserModel;
 import com.gridone.scraping.morpheme.MorphemeAnalysis;
 import com.gridone.scraping.wordcloud.StringProcessor;
 import com.gridone.scraping.wordcloud.WordCloud;
@@ -58,12 +63,21 @@ public class NewsMonitoringService {
 	@Autowired
 	NewsMapper newsMapper;
 	
+	@Autowired
+	UserService userService;
+	
 	private List<Map<String, Object>> errMonitoringList = new ArrayList<>();
 	
 	private static int INTERVAL = 3;
+	
+	private static Map<String, Object> scrapToken = new HashMap<>();
 
 	public void executeNewsMonitoring() {
-		List<Keyword> keywords = keywordService.selectAll();
+		List<Keyword> keywords = keywordService.selectAdmin(null);
+		List<UserModel> admins = userService.getAllAdmins();
+		for (UserModel u : admins) {
+			scrapToken.put(u.getId().toString(), true);
+		}
 		System.out.println("######executeNewsMonitoring");
 		
 		ForkJoinPool forkjoinPool = new ForkJoinPool(20);
@@ -87,6 +101,9 @@ public class NewsMonitoringService {
 //		setWordCount();
 		System.out.println("err Cnt : "+errMonitoringList.size());
 		System.out.println("errList : "+errMonitoringList);
+		for (UserModel u : admins) {
+			scrapToken.put(u.getId().toString(), null);
+		}
 	}
 	
 	public void scrapNewsMonitoring(String item, Keyword k, int interval) {
@@ -420,6 +437,77 @@ public class NewsMonitoringService {
 		}
 //		System.out.println("temp : "+temp.toString());
 		mailClient.prepareAndSend(toAddr, temp.toString());
+	}
+
+	public ResultList newsList(SearchBase searchBase) {
+		ResultList resultList = new ResultList(searchBase);
+		resultList.setResultList(newsMonitoringMapper.newsList(searchBase));
+		resultList.setTotalRecordCount(newsMonitoringMapper.newsListCount(searchBase));
+		return resultList;
+	}
+
+	public Map<String, Object> deleteByKeywordId(Keyword param) {
+		Map<String, Object> resultVal = new HashMap<String, Object>();
+		boolean result = false;
+		String msg = null;
+		try {
+			newsMonitoringMapper.deleteByKeywordId(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		resultVal.put("result", result);
+		resultVal.put("msg", msg);
+		return resultVal;
+	}
+
+	public Map<String, Object> executeNewsMonitoring(LoginUserDetails user) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean result = false;
+		String msg = null;
+		if(scrapToken.get(user.getId().toString()) != null) {
+			result = false;
+			msg = "스크랩이 진행중 입니다.";
+			map.put("result", result);
+			map.put("msg", msg);
+			return map;
+		}
+		scrapToken.put(user.getId().toString(), true);
+		List<Keyword> keywords = keywordService.selectAdmin(null);
+		
+		System.out.println("######executeNewsMonitoring");
+		
+		ForkJoinPool forkjoinPool = new ForkJoinPool(20);
+		try {
+			forkjoinPool.submit(() -> {
+				keywords.parallelStream().forEach(k -> {
+					String item = keywordService.convertKeyword(k);
+					scrapNewsMonitoring(item, k, INTERVAL);
+					try {
+						Thread.sleep((int)(Math.random()*5000)+500);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				});
+			}).get();
+			result = true;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+//		setWordCount();
+		System.out.println("err Cnt : "+errMonitoringList.size());
+		System.out.println("errList : "+errMonitoringList);
+		scrapToken.put(user.getId().toString(), null);
+		map.put("result", result);
+		map.put("msg", msg);
+		return map;
+	}
+	
+	public boolean checkScrapStatus() {
+		LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return scrapToken.get(user.getId().toString()) == null ? false : true;
 	}
 	
 }

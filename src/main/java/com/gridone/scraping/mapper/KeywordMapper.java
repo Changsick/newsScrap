@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.gridone.scraping.model.Keyword;
+import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.model.SearchBase;
 
 @Mapper
@@ -27,5 +28,7 @@ public interface KeywordMapper {
 	List<Keyword> selectByLogin(Integer id);
 
 	Integer deleteEnterpriseByLogin(Integer id);
+
+	List<Keyword> selectAdmin(LoginUserDetails user);
 
 }

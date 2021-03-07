@@ -31,6 +31,15 @@
 		FROM tb_keywords
 	</select>
 	
+	<select id="selectAdmin" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		SELECT k.ID, USERID, ENTERPRISE, KEYWORDS
+		FROM tb_keywords k left join tb_user u on k.USERID = u.ID
+		WHERE u.ROLE = 0
+		<if test="id != null">
+			AND USERID = #{id}
+		</if>
+	</select>
+	
 	<select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
 		SELECT ID, USERID, ENTERPRISE, KEYWORDS
 		FROM tb_keywords
