@@ -76,50 +76,25 @@
 	  text-align: center;
 	}
 	
-	.auth{
-		display: flex;
-		font-size: 18px;
-		justify-content: flex-end;
-		line-height: 30px;
-		height: 30px;
-		padding-right: 2%;
-	}
-	
-	.auth p{
-		font-weight: bold;
-		padding-left: 5px;
-	}
-	
-	.auth #admin, .auth #user{
-		display: flex;
-	}
-	
 </style>
+
 </head>
 
 <body>
-	<div id="header" th:include="fragment/header :: header"></div>
+	<div id="header" th:include="fragment/header :: header">
 	
-	<div class="auth">
-			<div id="admin">
-				<i class="fas fa-user-cog" style="align-self: center;"></i>
-            	<p>관리자</p>
-			</div>
-			<div id="user">
-				<i class="fas fa-user-alt" style="align-self: center;"></i>
-            	<p>사용자</p>
-			</div>
-    </div>
+	</div>
 	
 	<div class="container">
-      <div class="wrapper">
+      <div class="wrapper" th:if="${#authorization.expression('isAdmin()')}">
         <a th:href="@{|/monitoringNews|}" style="text-decoration: none;color: white;"><div class="context"><span>스케줄<br>뉴스 스크랩</span></div></a>
       </div>
       <div class="wrapper">
         <a th:href="@{|/dailyNews|}" style="text-decoration: none;color: white;"><div class="context"><span>즉시<br>뉴스 스크랩</span></div></a>
       </div>
       <div class="wrapper">
-        <a th:href="@{|/textmining|}" style="text-decoration: none;color: white;"><div class="context"><span>텍스트 데이터<br>마이닝</span></div></a>
+        <!-- th:href="@{|/textmining|}" -->
+        <a onclick="alert('개발중입니다.')" style="text-decoration: none;color: white;"><div class="context"><span>텍스트 데이터<br>마이닝</span></div></a>
       </div>
     </div>
 	

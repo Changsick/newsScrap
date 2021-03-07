@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,7 @@ public class NewsMonitoringController {
 		newsMonitoringService.monitoringSendEmail();
 	}
 	
+	@PreAuthorize("isAdmin()")
 	@GetMapping(value = "/monitoringNews")
 	public String monitoringNews() {
 		return "monitoringNews";

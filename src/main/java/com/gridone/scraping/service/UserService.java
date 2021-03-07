@@ -32,10 +32,8 @@ public class UserService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserModel user = userMapper.selectByLogin(username);
 		if(user == null) {
-			System.out.println("null");
 			throw new UsernameNotFoundException("login fail");
 		}else if(!user.getActive().equals(EnumActive.ACTIVE)) {
-			System.out.println("InActive");
 			throw new UsernameNotFoundException("not ativated user");
 		}
 		return new LoginUserDetails(user);

@@ -14,6 +14,7 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import com.gridone.scraping.service.UserService;
 
@@ -55,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
 	public void configure(WebSecurity web) throws Exception{
 		web.ignoring()
-		.antMatchers("/css/**", "/fontawesome-free-5.13.0-web/**", "/images/**", "/js/**", "/kendo/**");
+		.antMatchers("/css/**", "/fontawesome-free-5.13.0-web/**", "/images/**", "/js/**", "/chartJS/**");
 	}
 
     @Override
@@ -105,5 +106,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+    
+    @Bean
+    public SpringSecurityDialect springSecurityDialect(){
+        return new SpringSecurityDialect();
     }
 }

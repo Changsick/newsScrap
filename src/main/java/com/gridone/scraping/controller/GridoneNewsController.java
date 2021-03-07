@@ -3,8 +3,6 @@ package com.gridone.scraping.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,8 +33,6 @@ public class GridoneNewsController {
 
 	@RequestMapping("/dailyNews")
 	public String dailyNews() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		System.out.println(auth.getPrincipal());
 //		keywordService.insertCsv(); // 144번 vm과 같은 내용의 csv
 //		newsMonitoringService.isSimilaritySample(); // 유사도 테스트
 //		newsMonitoringService.executeNewsMonitoring(); // 모니터링 집계 테스트
@@ -132,7 +128,7 @@ public class GridoneNewsController {
 	
 	@PostMapping(value = "/sendMail")
 	public @ResponseBody Map<String, Object> sendHistoryMail(ScrapAttribute param){
-		System.out.println("mail param : "+param);
+		
 		return newsService.sendHistoryMail(param);
 	}
 	

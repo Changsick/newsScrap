@@ -352,7 +352,6 @@
 			};
 			var result = $.post(url, data);
 			result.done(function(data) {
-				console.log('certainNewsInsert data',data);
 				if(data.result){
 					newsList(1);
 					alert("스크랩 완료");
@@ -377,7 +376,6 @@
 		};
 		var result = $.post(url, data);
 		result.done(function(data) {
-			console.log('allNewsInsert data',data);
 			if(data.result){
 				alert("스크랩 완료");
 				newsList(1);
@@ -552,7 +550,6 @@
 	        var dataLength = $('#enterpriseList').children().length;
 
 	        if(scrollT + scrollH +1 >= contentH && dataLength < enterPageData.totalRecordCount) { // 스크롤바가 아래 쪽에 위치할 때
-	            console.log("hi!");
 	            enterPage ++;
 	            enterpriseList(enterPage, true, false);
 	        }

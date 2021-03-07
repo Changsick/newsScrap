@@ -29,7 +29,7 @@ public class UserController {
 	
 	@PostMapping(value = "/join")
 	public @ResponseBody Map<String, Object> join(@Valid @RequestBody UserModel um, final BindingResult bindingResult) {
-		System.out.println("UserModel : "+um);
+		
 		Map<String, Object> result = new HashMap<String, Object>();
 		int state_ok = -1;
 		UserModel user = userService.selectUser(um.getEmail());
@@ -40,7 +40,7 @@ public class UserController {
 			return result;
 		}
 		if (bindingResult.hasErrors()) {
-			System.out.println("bindingResult : "+bindingResult.getAllErrors());
+//			System.out.println("bindingResult : "+bindingResult.getAllErrors());
 		}
 		return userService.join(um);
 	}

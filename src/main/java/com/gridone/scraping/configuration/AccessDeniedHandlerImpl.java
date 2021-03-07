@@ -20,7 +20,6 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 		System.out.println("deny msg : "+accessDeniedException.getMessage());
 		
 		Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
-		System.out.println("authentication : "+authentication.getAuthorities());
 		
 		response.sendRedirect(request.getContextPath() + "/deny");
 	}
