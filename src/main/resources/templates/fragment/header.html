@@ -16,7 +16,7 @@
 <body>
 	<div id="header" th:fragment="header">
 		<div class="row" id="headRow" style="background-image: none; background-color: #ffffff;">
-			<img class="logo" th:src="@{/images/logo.png}" alt="logo" style="width: 240px; height: 45px;"/>
+			<a th:href="@{|/main|}" style="text-decoration: none;color: white;"><img class="logo" th:src="@{/images/logo.png}" alt="logo" style="width: 240px; height: 45px;"/></a>
 		</div>
 		<div sec:authorize="hasRole('USER')" style="float: right;">
 			<span style="position: relative;">

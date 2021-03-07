@@ -20,7 +20,7 @@ public class MainController {
 		if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
 			if(destUri.contains("login")) { // 인증된 사용자가 login 페이지 url을 요청할 경우 redirect
 				try {
-					response.sendRedirect(request.getContextPath()+"/dailyNews");
+					response.sendRedirect(request.getContextPath()+"/main");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

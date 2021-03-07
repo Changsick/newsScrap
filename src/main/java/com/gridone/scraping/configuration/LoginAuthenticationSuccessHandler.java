@@ -26,7 +26,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
 			Authentication authentication) throws IOException, ServletException {
 //		String username = request.getParameter("email");
 //		HttpSession session = request.getSession();
-		redirectStrategy.sendRedirect(request, response, "/dailyNews");
+		redirectStrategy.sendRedirect(request, response, "/main");
 //		Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 //		
 //		if (session != null && (roles.contains("USER") || roles.contains("ADMIN"))){
