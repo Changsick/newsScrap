@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.KeywordMapper;
 import com.gridone.scraping.mapper.NewsMapper;
+import com.gridone.scraping.mapper.NewsMonitoringMapper;
 import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.model.ResultList;
@@ -33,12 +34,33 @@ public class KeywordService {
 	@Autowired
 	NewsMapper newsMapper;
 	
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	NewsMonitoringMapper monitoringMapper;
+	
 	public ResultList selectSearchList(SearchBase searchBase) {
 		searchBase.setRecordCountPerPage(20);
-		ResultList resultList = new ResultList(searchBase);
-		resultList.setResultList(keywordMapper.selectSearchList(searchBase));
-		resultList.setTotalRecordCount(keywordMapper.selectSearchListCount(searchBase));
+		ResultList resultList = null;
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if(!auth.getPrincipal().equals("anonymousUser")) {		
+				LoginUserDetails user = (LoginUserDetails)auth.getPrincipal();
+				searchBase.setUserId(user.getId());
+				resultList = new ResultList(searchBase);
+				resultList.setResultList(keywordMapper.selectSearchList(searchBase));
+				resultList.setTotalRecordCount(keywordMapper.selectSearchListCount(searchBase));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return resultList;
+	}
+	
+	public List<Keyword> selectByLogin(Integer id){
+		return keywordMapper.selectByLogin(id);
 	}
 	
 	public List<Keyword> selectAll() {
@@ -119,9 +141,33 @@ public class KeywordService {
 	public Keyword deleteEnterprise(Keyword param) {
 		Map<String, Object> resultVal = new HashMap<>();
 		boolean result = true;
+		Integer deleteMonitoring = monitoringMapper.deleteByKeywordId(param);
 		Integer deleteNews = newsMapper.deleteNewsByKeywordId(param);
 		Integer delete = keywordMapper.deleteEnterprise(param);
 		resultVal.put("result", result);
 		return param;
 	}
+
+	public Map<String, Object> deleteEnterpriseAll() {
+		Map<String, Object> resultVal = new HashMap<>();
+		boolean result = false;
+		try {			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if(!auth.getPrincipal().equals("anonymousUser")) {
+				LoginUserDetails userDetails = (LoginUserDetails) auth.getPrincipal();
+				List<Keyword> keywords = keywordMapper.selectByLogin(userDetails.getId());
+				for (Keyword k : keywords) {
+					monitoringMapper.deleteByKeywordId(k);
+					newsMapper.deleteNewsByKeywordId(k);
+				}
+				Integer delete = keywordMapper.deleteEnterpriseByLogin(userDetails.getId());
+				result = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();			
+		}
+		resultVal.put("result", result);
+		return resultVal;
+	}
+
 }

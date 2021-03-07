@@ -5,10 +5,24 @@
 <meta charset="UTF-8" th:remove="tag">
 </head>
 
+		<script th:inline="javascript">
+		
+			$(function(){
+				var user = [[${authentication.principal}]];
+				console.log('user');
+			})
+		
+		</script>
 <body>
 	<div id="header" th:fragment="header">
 		<div class="row" id="headRow" style="background-image: none; background-color: #ffffff;">
 			<img class="logo" th:src="@{/images/logo.png}" alt="logo" style="width: 240px; height: 45px;"/>
+		</div>
+		<div sec:authorize="hasRole('USER')" style="float: right;">
+			<span style="position: relative;">
+				<span class="glyphicon glyphicon-user" aria-hidden="true"  title="현재 뉴스 스크랩" id="userArea" sec:authentication="name"></span>
+			</span>
+			<a th:href="@{|/logout|}">logout</a>
 		</div>
 	</div>
 </body>

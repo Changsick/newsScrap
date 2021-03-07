@@ -23,6 +23,8 @@ public class SearchBase implements Serializable  {
 	protected int pageSize = 10;
 	
 	private Integer keyword_id;
+	
+	private Integer userId;
 
 	public Integer getKeyword_id() {
 		return keyword_id;
@@ -34,6 +36,14 @@ public class SearchBase implements Serializable  {
 
 	public String getSearchVal() {
 		return searchVal;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 
 	public void setSearchVal(String searchVal) {

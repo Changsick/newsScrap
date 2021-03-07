@@ -1,7 +1,5 @@
 package com.gridone.scraping.controller;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,22 +7,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.gridone.scraping.clusterAnalysis.ClusteringEngine;
 import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.ScrapAttribute;
 import com.gridone.scraping.model.SearchBase;
-import com.gridone.scraping.morpheme.MorphemeAnalysis;
 import com.gridone.scraping.service.KeywordService;
 import com.gridone.scraping.service.NewsMonitoringService;
 import com.gridone.scraping.service.NewsService;
-
-import kr.co.shineware.nlp.posta.en.core.EnPosta;
 
 @Controller
 public class GridoneNewsController {
@@ -120,9 +115,30 @@ public class GridoneNewsController {
 		return keywordService.deleteEnterprise(param);
 	}
 	
+	@RequestMapping(value = "/deleteEnterpriseAll.json", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> deleteEnterpriseAll(){
+		return keywordService.deleteEnterpriseAll();
+	}
+	
 	@RequestMapping(value = "/getEnterprise.json", method = RequestMethod.POST)
 	public @ResponseBody Keyword getEnterprise(@RequestParam Integer id){
 		return keywordService.selectById(id);
+	}
+	
+	@PostMapping(value = "/sendMail")
+	public @ResponseBody Map<String, Object> sendHistoryMail(ScrapAttribute param){
+		System.out.println("mail param : "+param);
+		return newsService.sendHistoryMail(param);
+	}
+	
+	@PostMapping( value = "/checkScrapStatus")
+	public @ResponseBody boolean checkScrapStatus(){
+		return newsService.checkScrapStatus();
+	}
+	
+	@PostMapping(value = "/deleteNewsByKeyword.json")
+	public @ResponseBody Map<String, Object> deleteNewsByKeyword(Keyword param){
+		return newsService.deleteNewsByKeyword(param);
 	}
 	
 }

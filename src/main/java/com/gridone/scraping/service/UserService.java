@@ -1,11 +1,11 @@
 package com.gridone.scraping.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,19 +20,16 @@ import com.gridone.scraping.type.EnumUserRole;
 
 @Service
 public class UserService implements UserDetailsService {
-
-	List<UserDetails> uu = new ArrayList<UserDetails>();
 	
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	UserMapper userMapper;
-	
+
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		UserModel user = userMapper.selectByLogin(email);
-		System.err.println("username : "+email);
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		UserModel user = userMapper.selectByLogin(username);
 		if(user == null) {
 			System.out.println("null");
 			throw new UsernameNotFoundException("login fail");
@@ -41,9 +38,9 @@ public class UserService implements UserDetailsService {
 			throw new UsernameNotFoundException("not ativated user");
 		}
 		return new LoginUserDetails(user);
+//		return new User(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList(user.getRole().name()));
 	}
-
-
+	
 	public Map<String, Object> join(UserModel um) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		int state_ok = -1;
@@ -62,10 +59,8 @@ public class UserService implements UserDetailsService {
 		
 		return result;
 	}
-	
+
 	public UserModel selectUser(String email) {
 		return userMapper.selectByLogin(email);
 	}
-	
-	
 }

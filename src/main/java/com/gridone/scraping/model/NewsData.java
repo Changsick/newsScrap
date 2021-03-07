@@ -12,6 +12,8 @@ public class NewsData extends SearchBase {
 	private Date regitdate;
 	private Date newsdate;
 	private String press;
+	private String enterprise;
+	private String keywords;
 	
 	public NewsData() {
 		super();
@@ -89,6 +91,23 @@ public class NewsData extends SearchBase {
 	public void setPress(String press) {
 		this.press = press;
 	}
+	
+	public String getEnterprise() {
+		return enterprise;
+	}
+
+	public void setEnterprise(String enterprise) {
+		this.enterprise = enterprise;
+	}
+
+	public String getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
+
 	@Override
 	public String toString() {
 		return "NewsData [newsId=" + newsId + ", keywordId=" + keywordId + ", title=" + title + ", link=" + link

@@ -18,7 +18,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import com.gridone.scraping.service.UserService;
 
 @EnableWebSecurity
-@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -30,8 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	UserService userService;
 	
-	@Autowired
-	CustomAuthenticationProvider customAuthenticationProvider;
+//	@Autowired
+//	CustomAuthenticationProvider customAuthenticationProvider;
 
 	// 암호화에 필요한 PasswordEncoder 를 Bean 등록합니다.
     @Bean
@@ -47,10 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     
     // 권한 인증 절차(로그인)를 커스텀 할 수 있는 customAuthenticationProvider Bean을 등록합니다.
-    @Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(customAuthenticationProvider);
-	}
+//    @Override
+//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//		auth.authenticationProvider(customAuthenticationProvider);
+//	}
     
     // 권한인증 제외목록을 설정합니다.
     @Override
@@ -62,18 +61,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-        		.headers()
-        		.frameOptions().sameOrigin() // 동일 도메인에서는 iframe(X-Frame-Options) 랜더링 가능하도록  설정
-        		.httpStrictTransportSecurity().disable() // HTTPS Protocol 로만 접속하게 하지 않음(http도 지원)
-        		.and()
-                .httpBasic().disable() // rest api 만을 고려하여 기본 설정은 해제하겠습니다.
+//        		.headers()
+//        		.frameOptions().sameOrigin() // 동일 도메인에서는 iframe(X-Frame-Options) 랜더링 가능하도록  설정
+//        		.httpStrictTransportSecurity().disable() // HTTPS Protocol 로만 접속하게 하지 않음(http도 지원)
+//        		.and()
                 .csrf().disable()
                 .authorizeRequests() // 요청에 대한 사용권한 체크
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
                 .antMatchers("/user/**").hasAuthority("USER")
+                .antMatchers("/login","/register","/logout").permitAll()
         		.antMatchers("/**").authenticated()
-                .antMatchers("/login","/join","/logout").permitAll()
-                .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
+//                .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
                 .and().formLogin()
 					.loginPage("/login")
 					.usernameParameter("email")

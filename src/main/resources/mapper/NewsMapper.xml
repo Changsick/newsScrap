@@ -11,6 +11,8 @@
   		<result column="REGITDATE" jdbcType="TIMESTAMP" property="regitdate" />
   		<result column="NEWSDATE" jdbcType="TIMESTAMP" property="newsdate" />
   		<result column="PRESS" jdbcType="VARCHAR" property="press" />
+  		<result column="ENTERPRISE" jdbcType="VARCHAR" property="enterprise" />
+  		<result column="KEYWORDS" jdbcType="VARCHAR" property="keywords" />
   	</resultMap>
   
 	<insert id="insertNews" parameterType="com.gridone.scraping.model.NewsData">
@@ -21,23 +23,20 @@
 	<select id="newsList" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
 		SELECT NEWS_ID, KEYWORD_ID, TITLE, CONTENT, LINK, REGITDATE, NEWSDATE, PRESS
 		FROM tb_news
-		WHERE  1=1
-		<if test="keyword_id != null">
-			AND KEYWORD_ID = #{keyword_id}
-		</if>
+		WHERE  KEYWORD_ID = #{keyword_id}
+		
 		<if test="searchVal != null and searchVal != ''">
 			AND TITLE like CONCAT('%',#{searchVal},'%')
 		</if>
+		order by NEWSDATE desc
 		LIMIT #{firstIndex} , #{recordCountPerPage}
 	</select>
 	
 	<select id="newsListCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
 		SELECT count(*)
 		FROM tb_news
-		WHERE  1=1
-		<if test="keyword_id != null">
-			AND KEYWORD_ID = #{keyword_id}
-		</if>
+		WHERE  KEYWORD_ID = #{keyword_id}
+		
 		<if test="searchVal != null and searchVal != ''">
 			AND TITLE like CONCAT('%',#{searchVal},'%')
 		</if>
@@ -55,5 +54,14 @@
 		delete from tb_news
 		where KEYWORD_ID = #{id}
 	</delete>
+	
+	<select id="getNewsForMail" parameterType="com.gridone.scraping.model.ScrapAttribute" resultMap="BaseResultMap">
+		<![CDATA[
+		SELECT NEWS_ID, KEYWORD_ID, TITLE, CONTENT, LINK, REGITDATE, NEWSDATE, PRESS, k.ENTERPRISE, k.KEYWORDS
+		FROM tb_news n left join tb_keywords k on n.KEYWORD_ID = k.ID
+		WHERE k.USERID = #{userId}
+		 AND n.NEWSDATE >= #{startDate} and n.NEWSDATE <= #{endDate}
+		]]>
+	</select>
 
 </mapper>

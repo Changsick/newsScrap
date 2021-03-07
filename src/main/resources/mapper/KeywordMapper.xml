@@ -12,14 +12,18 @@
 	<select id="selectSearchList" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
 		SELECT ID, USERID, ENTERPRISE, KEYWORDS
 		FROM tb_keywords
-		WHERE ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		WHERE 
+		 USERID = #{userId} 	AND 
+		ENTERPRISE like CONCAT('%',#{searchVal},'%')
 		LIMIT #{firstIndex} , #{recordCountPerPage} 
   	</select>
   	
 	<select id="selectSearchListCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
 		SELECT count(*)
 		FROM tb_keywords
-		WHERE ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		WHERE 
+		 USERID = #{userId} 	AND 
+		ENTERPRISE like CONCAT('%',#{searchVal},'%')
   	</select>
 
 	<select id="selectAll" resultMap="BaseResultMap">
@@ -47,6 +51,17 @@
 	<delete id="deleteEnterprise" parameterType="com.gridone.scraping.model.Keyword">
 		delete from tb_keywords
 		where ID = #{id}
+	</delete>
+	
+	<select id="selectByLogin" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		SELECT ID, USERID, ENTERPRISE, KEYWORDS
+		FROM tb_keywords
+		WHERE USERID = #{id}
+	</select>
+	
+	<delete id="deleteEnterpriseByLogin" parameterType="java.lang.Integer">
+		delete from tb_keywords
+		where USERID = #{id}
 	</delete>
 
 </mapper>

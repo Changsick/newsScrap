@@ -11,19 +11,27 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.NewsMapper;
 import com.gridone.scraping.model.Keyword;
+import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.model.NewsData;
+import com.gridone.scraping.model.NewsMonitoring;
 import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.ScrapAttribute;
 import com.gridone.scraping.model.SearchBase;
+import com.gridone.scraping.model.SendMinigNews;
+import com.gridone.scraping.wordcloud.WordCount;
 
 @Service
 public class NewsService {
@@ -32,6 +40,9 @@ public class NewsService {
 	private static String KOREA_COVID_DATAS_URL2 = "https://search.naver.com/search.naver?query=keyword&where=news&pd=3&ds=startDate&de=endDate&sort=1";//&field=1
 	//pd=3&ds=2020.01.01&de=2021.01.13
 	
+
+	private static Map<String, Object> scrapToken = new HashMap<>();
+	
 	private List<Map<String, Object>> errList = new ArrayList<>();
 	
 	@Autowired
@@ -39,6 +50,12 @@ public class NewsService {
 	
 	@Autowired
 	KeywordService keywordService;
+	
+	@Autowired
+	NewsMonitoringService monitoringService;
+	
+	@Autowired
+	MailClient mailClient;
 	
 	public void getNewsScraping(String item, Keyword k, ScrapAttribute param, int interval) {
 		String sendUrl =  null;
@@ -157,9 +174,18 @@ public class NewsService {
 		Map<String, Object> resultVal = new HashMap<>();
 		boolean result = true;
 		String msg = null;
+		LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if(scrapToken.get(user.getId().toString()) != null) {
+			result = false;
+			msg = "스크랩이 진행중 입니다.";
+			resultVal.put("result", result);
+			resultVal.put("msg", msg);
+			return resultVal;
+		}
+		scrapToken.put(user.getId().toString(), true);
 		try {
 			System.err.println("start all News Scrap");
-			List<Keyword> keywords = keywordService.selectAll();
+			List<Keyword> keywords = keywordService.selectByLogin(user.getId());
 
 			long startTime = System.currentTimeMillis();
 			
@@ -213,6 +239,7 @@ public class NewsService {
 			e.printStackTrace();
 			result = false;
 		}
+		scrapToken.put(user.getId().toString(), null);
 		errList.clear();
 		resultVal.put("result", result);
 		resultVal.put("msg", msg);
@@ -239,5 +266,160 @@ public class NewsService {
 		}
 		return result;
 	}
+
+	public boolean checkScrapStatus() {
+		LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return scrapToken.get(user.getId().toString()) == null ? false : true;
+	}
+
+	public Map<String, Object> deleteNewsByKeyword(Keyword param) {
+		Map<String, Object> resultVal = new HashMap<String, Object>();
+		boolean result = false;
+		String msg = null;
+		try {
+			newsMapper.deleteNewsByKeywordId(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		resultVal.put("result", result);
+		resultVal.put("msg", msg);
+		return resultVal;
+	}
+
+	public Map<String, Object> sendHistoryMail(ScrapAttribute param) {
+		LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		param.setUserId(user.getId());
+		List<NewsData> monitoring = newsMapper.getNewsForMail(param);
+		System.out.println("monitoring : "+monitoring);
+		System.out.println("monitoring size : "+monitoring.size());
+		List<SendMinigNews> sendEmailData = new ArrayList<>();
+		try {
+			if(monitoring != null && monitoring.size() > 0) {
+				List<NewsData> sendData = null;
+				
+				List<String> title = new ArrayList<>();
+				List<String> content = new ArrayList<>();
+				
+				int idx = 0;
+				for(int i=0; i<monitoring.size(); i++) {
+					
+					title.add(monitoring.get(i).getTitle()+" ");
+					content.add(monitoring.get(i).getContent()+" ");
+					if(i > 0 && !( monitoring.get(i).getKeywordId().equals(monitoring.get(i-1).getKeywordId())) ) {
+						SendMinigNews tempData = new SendMinigNews();
+						sendData = new ArrayList<>(monitoring.subList(idx, i));
+						HashMap<String, Object> textmining = monitoringService.setWordCount(title.subList(idx, i).toString(), content.subList(idx, i).toString());
+						tempData.setEnterprise(monitoring.get(i-1).getEnterprise());
+						tempData.setMiningText(textmining);
+						tempData.setNewsList(sendData);
+						sendEmailData.add(tempData);
+						idx = i;
+					}
+					
+					if(i == monitoring.size()-1) {
+						SendMinigNews tempData = new SendMinigNews();
+						sendData = new ArrayList<>(monitoring.subList(idx, i+1));
+						HashMap<String, Object> textmining = monitoringService.setWordCount(title.subList(idx, i+1).toString(), content.subList(idx, i+1).toString());
+						tempData.setEnterprise(monitoring.get(i).getEnterprise());
+						tempData.setMiningText(textmining);
+						tempData.setNewsList(sendData);
+						sendEmailData.add(tempData);
+					}
+				}
+				
+			}
+			
+			sendEmail(sendEmailData, user);
+			
+//			movetoNewsTable(monitoring);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
+	public void sendEmail(List<SendMinigNews> sendEmailData, LoginUserDetails user) {	
+		String container = "width: fit-content;";
+		String content = "position: relative;";
+		String content_row = "display: inline-block;max-width: 800px;max-height: 600px;overflow-y: auto;";
+		String elements = "float: left;";
+		
+		
+		StringBuffer temp = new StringBuffer();
+		temp.append("<div class='container' style='"+container+"'>");
+		if(sendEmailData == null || sendEmailData.size() == 0) {
+			temp.append("<div class='header'> 모니터링의 소식이 없습니다. </div>");
+		}else {			
+			for (SendMinigNews item : sendEmailData) {
+//				for (Entry<String, ArrayList<WordCount>> entry  : item.getMiningText().entrySet()) {
+//					System.out.println("key : "+entry.getKey() + ", value : " + entry.getValue().toString());
+//				}
+				List<NewsData> itemList = (List<NewsData>)item.getNewsList();
+				temp.append("<div class='header'> Keyword : "+itemList.get(0).getKeywords()+"</div>");
+				temp.append("<div class='content' style='"+content+"'>");
+				
+				temp.append("<div class='content_row' style='"+content_row+"clear: both;display: block;'><table>");
+				
+				temp.append("<thead><tr>");				
+				temp.append("<th style='background-color: #FFC107;' colspan='3'>"+item.getEnterprise()+" 뉴스</th></tr>");
+				temp.append("<tr><th scope='col' style='width: 200px;'>제목</th><th scope='col'>요약</th><th scope='col' style='width: 100px;'>언론사</th>");
+				temp.append("</tr></thead>");
+				
+				temp.append("<tbody>");
+				for (NewsData item2 : itemList) {
+					temp.append("<tr >");
+					temp.append("<td ><a href='"+item2.getLink()+"'>"+item2.getTitle()+"</a></td>");
+					temp.append("<td>"+item2.getContent()+"</td>");
+					temp.append("<td>"+item2.getPress()+"</td>");
+					temp.append("</tr>");
+				}
+				temp.append("</tbody>");
+				temp.append("</table></div>"); // end content_row(table)
+				
+				temp.append("<div class='content_row elements' style='"+content_row+elements+"width:200px;'>");
+//				temp.append("");
+				temp.append("<ul><b>Top5</b><br>");
+				List<WordCount> list = (List<WordCount>)item.getMiningText().get("content");
+				for (WordCount w : list) {					
+					temp.append("<br><li>"+w.toString()+"</li>");
+				}
+				temp.append("</ul>");
+				temp.append("</div>"); // end content_row(elements)
+				temp.append("<div class='content_row elements' style='"+content_row+elements+"width:200px;'>");
+//				temp.append("<h3>Low5</h3>");
+				temp.append("<ul>Low5<br>");
+				List<WordCount> list2 = (List<WordCount>)item.getMiningText().get("contentLower");
+				for (WordCount w : list2) {					
+					temp.append("<br><li>"+w.toString()+"</li>");
+				}
+				temp.append("</ul>");
+				temp.append("</div>"); // end content_row(elements)
+
+				temp.append("<div class='content_row elements' style='"+content_row+elements+"'>");
+				temp.append("<ul>Word Cloud<br>");
+				temp.append("<img width='300px;' src='data:image/png;base64,"+item.getMiningText().get("contentImage")+"'>");
+				temp.append("</ul>");
+				temp.append("</div>"); // end content_row(elements)
+				
+				temp.append("<div class='footer' style='clear: both;'></div>");
+				
+				temp.append("</div>"); // end content
+			}
+		}
+		temp.append("</div>");
+		String email = user.getEmail();
+		
+		InternetAddress[] toAddr = new InternetAddress[1];
+		for(int i=0; i<toAddr.length; i++) {
+			try {
+				toAddr[i] = new InternetAddress(email.trim());
+			} catch (AddressException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("temp : "+temp.toString());
+		mailClient.prepareAndSend(toAddr, temp.toString());
+	}
+
 }

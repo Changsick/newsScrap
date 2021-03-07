@@ -35,5 +35,10 @@
 	<delete id="deleteAll">
 		delete from tb_monitoring_news
 	</delete>
+	
+	<delete id="deleteByKeywordId" parameterType="com.gridone.scraping.model.Keyword">
+		delete from tb_monitoring_news
+		where KEYWORD_ID = #{id}
+	</delete>
 
 </mapper>

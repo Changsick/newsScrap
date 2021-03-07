@@ -356,7 +356,8 @@ public class NewsMonitoringService {
 //				for (Entry<String, ArrayList<WordCount>> entry  : item.getMiningText().entrySet()) {
 //					System.out.println("key : "+entry.getKey() + ", value : " + entry.getValue().toString());
 //				}
-				temp.append("<div class='header'> Keyword : "+item.getNewsList().get(0).getKeywords()+"</div>");
+				List<NewsMonitoring> itemList = (List<NewsMonitoring>)item.getNewsList();
+				temp.append("<div class='header'> Keyword : "+itemList.get(0).getKeywords()+"</div>");
 				temp.append("<div class='content' style='"+content+"'>");
 				
 				temp.append("<div class='content_row' style='"+content_row+"clear: both;display: block;'><table>");
@@ -367,7 +368,7 @@ public class NewsMonitoringService {
 				temp.append("</tr></thead>");
 				
 				temp.append("<tbody>");
-				for (NewsMonitoring item2 : item.getNewsList()) {
+				for (NewsMonitoring item2 : itemList) {
 					temp.append("<tr >");
 					temp.append("<td ><a href='"+item2.getLink()+"'>"+item2.getTitle()+"</a></td>");
 					temp.append("<td>"+item2.getContent()+"</td>");
@@ -417,7 +418,7 @@ public class NewsMonitoringService {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("temp : "+temp.toString());
+//		System.out.println("temp : "+temp.toString());
 		mailClient.prepareAndSend(toAddr, temp.toString());
 	}
 	

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.service.UserService;
 
-@Component
+//@Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired

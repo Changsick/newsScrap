@@ -24,4 +24,8 @@ public interface KeywordMapper {
 
 	Integer deleteEnterprise(Keyword param);
 
+	List<Keyword> selectByLogin(Integer id);
+
+	Integer deleteEnterpriseByLogin(Integer id);
+
 }

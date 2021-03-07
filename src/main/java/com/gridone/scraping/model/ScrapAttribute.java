@@ -9,6 +9,14 @@ public class ScrapAttribute {
 	private Integer id;
 	private String startDate;
 	private String endDate;
+	private Integer userId;
+	
+	public Integer getUserId() {
+		return userId;
+	}
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
 	public Integer getId() {
 		return id;
 	}
@@ -29,10 +37,9 @@ public class ScrapAttribute {
 	}
 	@Override
 	public String toString() {
-		return "ScrapAttribute [id=" + id + ", startDate=" + startDate + ", endDate=" + endDate + "]";
+		return "ScrapAttribute [id=" + id + ", startDate=" + startDate + ", endDate=" + endDate + ", userId=" + userId
+				+ "]";
 	}
 	
 	
-	
-
 }

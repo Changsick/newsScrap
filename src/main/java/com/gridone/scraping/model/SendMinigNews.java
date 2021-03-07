@@ -12,7 +12,7 @@ public class SendMinigNews {
 	
 	private HashMap<String, Object> miningText;
 	
-	private List<NewsMonitoring> newsList;
+	private List<?> newsList;
 
 	public String getEnterprise() {
 		return enterprise;
@@ -30,11 +30,11 @@ public class SendMinigNews {
 		this.miningText = miningText;
 	}
 
-	public List<NewsMonitoring> getNewsList() {
+	public List<?> getNewsList() {
 		return newsList;
 	}
 
-	public void setNewsList(List<NewsMonitoring> newsList) {
+	public void setNewsList(List<?> newsList) {
 		this.newsList = newsList;
 	}
 

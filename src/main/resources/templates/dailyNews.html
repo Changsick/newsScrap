@@ -53,8 +53,22 @@
 		padding: 10px 20px;
 	}
 	
-	.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
+	.nav-pills>li.active, .nav-pills>li.active:focus, .nav-pills>li.active:hover{
 		background-color: #4ca0cc;	
+	}
+	
+	.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+	    color: #fff;
+	    background-color:#4ca0cc;
+	}
+	
+	.nav-pills>li {
+	    border-radius: 4px;
+	}
+	
+	.nav>li:focus, .nav>li:hover {
+	    background-color: #eee;
+	    cursor: pointer;
 	}
 	
 	.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover{
@@ -62,6 +76,11 @@
 		border-color: #4ca0cc;
 	}
 	
+	.btnDiv{
+		display: inline-block;
+		float: right;
+		padding-top: 2.5%;
+	}
 /* .active-cyan-2 input.form-control[type=text]:focus:not([readonly]) {
   border-bottom: 1px solid #4dd0e1;
   box-shadow: 0 1px 0 0 #4dd0e1;
@@ -77,7 +96,7 @@
 
 <script id="list-template" type="text/x-handlebars-template">
 	{{#resultList}}
-		<li role="presentation" id="{{id}}" ><a onclick="getNews(event, {{id}})" href="#">{{enterprise}}</a></li>
+		<li role="presentation" id="{{id}}" onclick="getNews(event, {{id}})" ><a id="text_{{id}}" style="display:inline-block;" onclick='activeCss(event, {{id}})'>{{enterprise}}</a></li>
 		
 		{{else}} <li role="presentation" >데이터가 없습니다.</li>
 	{{/resultList}}
@@ -152,12 +171,10 @@
 		};
 		var result = $.post(enterpriseListUrl,data);
 		result.done(function(data) {
-// 			console.log('enterpriseList',data);
 	    	var source = $("#list-template").html();
 			var template = Handlebars.compile(source);
 			var itemList = template(data);
 			enterPageData = data.paging;
-// 			console.log('enterPageData',enterPageData);
 			if(isScroll){ // 스크롤 시 로드			
 				$('#enterpriseList').append(itemList);
 			}else{
@@ -170,6 +187,7 @@
 				}
 				newsList(1);
 				firstLoadActive();
+				
 			}
 	    });
 		result.fail(function(xhr, status, error) {
@@ -182,27 +200,53 @@
 		enterPage = 1;
 		enterpriseList(enterPage, false, true);
 	}
-	
+		
 	function firstLoadActive(){
 		$("#enterpriseList").children().removeClass('active');
-		if(enterPageData.totalRecordCount != 0){			
+		if(enterPageData.totalRecordCount != 0){		
+			switchingCss();
 			var firstNode = $("#enterpriseList").children()[0];
+			var firstId = firstNode.getAttribute("id");
 			firstNode.setAttribute("class","active");
 			bindEditModal();
+// 			console.log(firstId);
+			$("#"+firstId).append(makeButton());
 		}
-// 		firstNode.addClass('active');
-// 		$("#enterpriseList").children()[0].addClass('active');
+	}
+	
+	function activeCss(e, key_id){
+		e.stopPropagation();
+		switchingCss();
+		 $(e.target).parent('li').addClass('active');
+		 $("#currEnter").val(key_id);
+		 $(e.target).parent('li').append(makeButton());
+		 var form = document.getElementById("searchTitle");
+	    form.reset();
+	    newsList(1);
+	    bindEditModal();
+	}
+	
+	function switchingCss(){
+		$(".btnDiv").remove();
+	    $('.nav li').removeClass('active');
 	}
 	
 	function getNews(e, key_id){
 		e.stopPropagation();
-	    $('.nav li').removeClass('active');
-	    $(e.target).parent('li').addClass('active');
+		switchingCss();
+// 	    $(e.target).parent('li').addClass('active');
+	    $(e.target).addClass('active');
 	    $("#currEnter").val(key_id);
+	    $(e.target).append(makeButton());
 	    var form = document.getElementById("searchTitle");
 	    form.reset();
 	    newsList(1);
 	    bindEditModal();
+	}
+	
+	function makeButton(){
+		var button = "<div class='btnDiv'><button onclick='modifyClick(event)'>수정</button><button onclick='deleteKeyword(event)'>삭제</button></div>";
+		return button;
 	}
 	
 	function newsList(page){
@@ -250,7 +294,7 @@
 	}
 	
 	function certainNewsInsert(){
-		alert("\""+$("#"+$("#currEnter").val()).children().text()+"\" 에 대한 키워드로 스크랩합니다."+"\n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
+		alert("\""+$("#"+$("#currEnter").val()).children().text()+"\" 키워드로 스크랩합니다."+"\n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
 		var keyId = $("#enterpriseList").find("li[class='active']").attr("id");
 		if(keyId != null && keyId != undefined){
 			var url = [[@{|/certainNewsInsert|}]];
@@ -278,7 +322,7 @@
 	}
 	
 	function allNewsInsert(){
-		alert("전체회사에 대한 키워드로 스크랩합니다. \n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
+		alert("전체 키워드로 스크랩합니다. \n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
 		var url = [[@{|/allNewsInsert|}]];
 		var data = {
 			startDate : $("#startDate").val(),
@@ -291,7 +335,7 @@
 				alert("스크랩 완료");
 				newsList(1);
 			}else{
-				alert("실패");
+				alert(data.msg);
 			}
 	    });
 		result.fail(function(xhr, status, error) {
@@ -316,11 +360,117 @@
 		$("#endDate").val(dateformat(currDate));
 	}
 	
+	function modifyClick(e){
+		e.stopPropagation();
+		$("#modifySetting").modal("show");
+	}
+	
+	function deleteKeyword(e){
+		e.stopPropagation();
+		var form = document.getElementById("modifyForm");
+		var data = $("form#modifyForm").serializeObject();
+		data.id = $("#currEnter").val();
+		var url = [[@{|/deleteEnterprise.json|}]];
+		var result = $.post(url, data);
+		result.done(function(data) {
+			alert("삭제되었습니다.");
+			enterPage = 1;
+			enterpriseList(enterPage, false, true);
+	    });
+		result.fail(function(xhr, status, error) {
+			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+			alert("fail");
+	    });
+		
+		form.reset();
+	}
+	
+	function deleteAll(){
+		var form = document.getElementById("modifyForm");
+		form.reset();
+		var url = [[@{|/deleteEnterpriseAll.json|}]];
+		var result = $.post(url);
+		
+		result.done(function(data) {
+			alert("삭제되었습니다.");
+			enterPage = 1;
+			enterpriseList(enterPage, false, true);
+	    });
+		result.fail(function(xhr, status, error) {
+			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+			alert("fail");
+	    });
+	}
+	
+	function getScrapStatus(){
+		var url = [[@{|/checkScrapStatus|}]];
+		
+		var result = $.post(url);
+		result.done(function(data) {
+			if(data){
+				$("#scrapStatusView").css("display","block");
+			}else{
+				$("#scrapStatusView").css("display","none");
+			}
+	    });
+		result.fail(function(xhr, status, error) {
+			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+			$("#scrapStatusView").css("display","none");
+// 			if(timerId != null){
+//	 			clearInterval(timerId);
+//	 		}
+	    });
+		
+	}
+	
+	function deleteNews(){
+		var form = document.getElementById("modifyForm");
+		var data = $("form#modifyForm").serializeObject();
+		data.id = $("#currEnter").val();
+		var url = [[@{|/deleteNewsByKeyword.json|}]];
+		var result = $.post(url, data);
+		result.done(function(data) {
+			alert("삭제되었습니다.");
+			newsList(1);
+	    });
+		result.fail(function(xhr, status, error) {
+			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+			alert("fail");
+	    });
+		
+		form.reset();
+	}
+	
+	function sendMail(){
+		var url = [[@{|/sendMail|}]];
+		var data = {
+			startDate : $("#startDate").val(),
+			endDate : $("#endDate").val()
+		};
+		console.log(data);
+		var result = $.post(url, data);
+		result.done(function(data) {
+			alert('완료');
+// 			if(data.result){
+				
+// 			}else{
+// 				alert("실패");
+// 			}
+	    });
+		result.fail(function(xhr, status, error) {
+			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+			alert("fail");
+	    });
+	}
+	
+	var timerId = null;
 	$(function(){
 		enterpriseList(1, false, true);
 		
 		dateSetting();
-		
+		getScrapStatus();
+		timerId = setInterval(getScrapStatus, 1000);
+// 		
 		$(document).keypress(function(event){
 			if(event.which == 13){
 				event.preventDefault();
@@ -343,7 +493,8 @@
 			$("#addEnterprise").modal("show");
 		});
 		
-		$("#modify").click(function(){
+		$("#modify").click(function(e){
+			e.stopPropagation();
 			$("#modifySetting").modal("show");
 		});
 		
@@ -371,6 +522,13 @@
 			var form = document.getElementById("addForm");
 			var data = $("form#addForm").serializeObject();
 			var url = [[@{|/addEnterprise.json|}]];
+			
+			if(data.enterprise.length == 0){
+				alert("검색어를 입력해주세요");
+				$("input[name='enterprise']").focus();
+				return false;
+			}
+			
 			var result = $.post(url, data);
 			result.done(function(data) {
 				alert("저장되었습니다.");
@@ -395,7 +553,9 @@
 			result.done(function(data) {
 				alert("저장되었습니다.");
 				bindEditModal();
-				$("#"+$("#currEnter").val()).children().text(data.enterprise);
+				var textId = $("#"+$("#currEnter").val()).children()[0].getAttribute("id");
+				$("#"+textId).text(data.enterprise);
+// 				$("#"+$("#currEnter").val()).children()[0].text(data.enterprise);
 		    });
 			result.fail(function(xhr, status, error) {
 				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
@@ -434,17 +594,16 @@
 	<div class="row">
 		<div class="col-md-3" style="padding-left: 5%; vertical-align: middle;">
 			<div class="buttons">
-				<button>키워드<br>입력</button>
-				<button>스크랩<br>시작</button>
-				<button>메일<br>발송</button>
-				<button>스크랩 키워드<br>일괄 삭제</button>
+				<button id="add">키워드<br>입력</button>
+				<button onclick="allNewsInsert()">스크랩<br>시작</button>
+				<button onclick="sendMail()">메일<br>발송</button>
+				<button onclick="deleteAll()">스크랩 키워드<br>일괄 삭제</button>
 			</div>
 			<div>
 				<input type="date" id="startDate" name="startDate"> ~ 
 				<input type="date" id="endDate" name="endDate">
-				<span style="position: relative;cursor: pointer;float: right;top: 5px;">
-				&nbsp;<span onclick="certainNewsInsert()" class="glyphicon glyphicon-play" aria-hidden="true" style="cursor: pointer;" title="현재 뉴스 스크랩"></span>
-				  &nbsp;<span onclick="allNewsInsert()" class="glyphicon glyphicon-forward" aria-hidden="true" style="cursor: pointer;" title="전체 뉴스 스크랩" ></span>
+				<span id="scrapStatusView" style="display:none;position: relative;cursor: pointer;float: right;top: 5px;">
+				&nbsp;&nbsp;<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" style="color: red;" title="현재 뉴스 스크랩">스크랩중</span>
 				</span>
 			</div>
 			<form class="form-inline d-flex justify-content-center md-form form-sm active-cyan-2 mt-2" name="searchEnterprise" style="margin-top: 2%">
@@ -456,10 +615,10 @@
 			        </span>
 		    	</div>
 			  <!-- <i class="fas fa-search" aria-hidden="true"></i> -->
-			  <span style="position: relative;cursor: pointer;float: right;top: 5px;">
-				  &nbsp;<span id="add" class="glyphicon glyphicon-plus" aria-hidden="true" style="cursor: pointer;" title="기업 추가"></span>
-				  &nbsp;<span id="modify" class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor: pointer;" title="기업 수정"></span>			  
-			  </span> 
+<!-- 			  <span style="position: relative;cursor: pointer;float: right;top: 5px;"> -->
+<!-- 				  &nbsp;<span id="add" class="glyphicon glyphicon-plus" aria-hidden="true" style="cursor: pointer;" title="기업 추가"></span> -->
+<!-- 				  &nbsp;<span id="modify" class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor: pointer;" title="기업 수정"></span>			   -->
+<!-- 			  </span>  -->
 			</form>
 			<div id="enterpriseArea" align="center" style="margin-top: 5%;height: 600px;overflow-y: auto;">
 				<ul class="nav nav-pills nav-stacked" id="enterpriseList">
@@ -471,7 +630,7 @@
 		</div>
 		
 		<div class="col-md-9" align="right" style="padding-right: 5%; margin-top: 2%;">
-		<div style="padding: 10px 0px;"><button>데이터 일괄 삭제</button></div>
+		<div style="padding: 10px 0px;"><button onclick="deleteNews()">데이터 일괄 삭제</button></div>
 			<form class="form-inline d-flex justify-content-center md-form form-sm active-cyan-2 mt-2" name="searchTitle" id="searchTitle">
 				<input type="hidden" id="currEnter" name="enterprise">
 				<div class="input-group" style="width: 70%;">
