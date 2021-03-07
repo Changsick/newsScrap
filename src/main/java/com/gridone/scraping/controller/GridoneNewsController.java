@@ -64,6 +64,11 @@ public class GridoneNewsController {
 		return "dailyNews";
 	}
 	
+	@RequestMapping("/main")
+	public String main(){
+		return "main";
+	}
+	
 	@RequestMapping("/login")
 	public String login(){
 		return "login";
