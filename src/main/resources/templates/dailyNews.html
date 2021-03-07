@@ -3,6 +3,8 @@
 	xmlns:th="http://www.thymeleaf.org">
 <div th:replace="fragment/includes :: heads"></div>
 
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
 </head>
 <style>
 @font-face {
@@ -28,12 +30,9 @@
 	#footRow {
 		text-align: center;
 		border-top: 2px solid gray;
-		bottom: 0;
 		margin: 0;
-		padding: 10px;
 		width: 100%;
 		height: 100px;
-		position: absolute;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -47,10 +46,10 @@
 		margin: 0;	
 	}
 	
-	.buttons{
+	.buttons, .buttons_2{
 		display: flex;
 		justify-content: space-between;
-		padding: 10px 20px;
+		padding: 3px 0px;
 	}
 	
 	.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
@@ -60,6 +59,51 @@
 	.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover{
 		background-color: #4ca0cc;
 		border-color: #4ca0cc;
+	}
+	
+	input[type="date"]{
+		width: -webkit-fill-available;
+		height: 45px;
+		border: 2px solid #58baed;
+		border-radius: 5px;
+		padding: 0px 10px;
+	}
+	
+	#searchBar, #searchBar2{
+		width: -webkit-fill-available;
+		border: 2px solid #58baed;
+		border-radius: 5px;
+		display: flex;
+	}
+	
+	#searchBar button, #searchBar2 button{
+		background-color: #58baed;
+	    background-image: none;
+	    border: none;
+	    border-radius: 0px;
+	} 
+	
+	.buttons button, .buttons_2 button{
+		background-color: #58baed;
+	    background-image: none;
+	    border: none;
+	    border-radius: 3px;
+	    color: white;
+	    width: -webkit-fill-available;
+	    font-size: 12px;
+	    margin: 0px 2px;
+	    padding: 5px;
+	}
+	
+	#deleteAll{
+		background-color: #58baed;
+	    background-image: none;
+	    border: none;
+	    border-radius: 3px;
+	    color: white;
+	    font-size: 12px;
+	    margin: 0px 2px;
+	    padding: 5px;
 	}
 	
 /* .active-cyan-2 input.form-control[type=text]:focus:not([readonly]) {
@@ -439,29 +483,25 @@
 				<button>메일<br>발송</button>
 				<button>스크랩 키워드<br>일괄 삭제</button>
 			</div>
-			<div>
-				<input type="date" id="startDate" name="startDate"> ~ 
+			<div class="buttons_2">
+				<button onclick="certainNewsInsert()">현재 뉴스<br>스크랩</button>
+				<button onclick="allNewsInsert()">전체 뉴스<br>스크랩</button>
+				<button id="add">기업<br>추가</button>
+				<button id="modify">기업<br>수정</button>
+			</div>
+			<div class="setDate" style="display: flex;">
+				<input type="date" id="startDate" name="startDate">
+				<label style="line-height: 40px; font-weight: bold; padding: 3px;">~</label>
 				<input type="date" id="endDate" name="endDate">
-				<span style="position: relative;cursor: pointer;float: right;top: 5px;">
-				&nbsp;<span onclick="certainNewsInsert()" class="glyphicon glyphicon-play" aria-hidden="true" style="cursor: pointer;" title="현재 뉴스 스크랩"></span>
-				  &nbsp;<span onclick="allNewsInsert()" class="glyphicon glyphicon-forward" aria-hidden="true" style="cursor: pointer;" title="전체 뉴스 스크랩" ></span>
-				</span>
 			</div>
 			<form class="form-inline d-flex justify-content-center md-form form-sm active-cyan-2 mt-2" name="searchEnterprise" style="margin-top: 2%">
-				<div class="input-group" style="width: 70%;">
-				    <input class="form-control" type="text" placeholder="Search"
-				    aria-label="Search" id="enterpriseSearch">
-				    <span class="input-group-btn" style="width: 1px;">
-			        	<button class="btn btn-default" type="button" onclick="searchEnter()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-			        </span>
+				<div class="input-group" id="searchBar">
+				    <input class="form-control" type="text" placeholder="검색"
+				    aria-label="Search" id="enterpriseSearch" style="border: none;">
+				    <button class="btn btn-default" type="button" onclick="searchEnter()"><i class="fas fa-search" style="color: white;"></i></button>
 		    	</div>
-			  <!-- <i class="fas fa-search" aria-hidden="true"></i> -->
-			  <span style="position: relative;cursor: pointer;float: right;top: 5px;">
-				  &nbsp;<span id="add" class="glyphicon glyphicon-plus" aria-hidden="true" style="cursor: pointer;" title="기업 추가"></span>
-				  &nbsp;<span id="modify" class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor: pointer;" title="기업 수정"></span>			  
-			  </span> 
 			</form>
-			<div id="enterpriseArea" align="center" style="margin-top: 5%;height: 600px;overflow-y: auto;">
+			<div id="enterpriseArea" align="center" style="margin-top: 5%;height: 480px; overflow-y: auto;">
 				<ul class="nav nav-pills nav-stacked" id="enterpriseList">
 				  <!-- <li role="presentation" class="active"><a onclick="getNews(1)" href="#">Home</a></li>
 				  <li role="presentation"><a onclick="getNews(2)" href="#">Profile</a></li>
@@ -471,15 +511,15 @@
 		</div>
 		
 		<div class="col-md-9" align="right" style="padding-right: 5%; margin-top: 2%;">
-		<div style="padding: 10px 0px;"><button>데이터 일괄 삭제</button></div>
+		<div style="padding: 10px 0px;">
+			<button id="deleteAll"><i class="fas fa-trash-alt"></i> 데이터 일괄 삭제</button>
+		</div>
 			<form class="form-inline d-flex justify-content-center md-form form-sm active-cyan-2 mt-2" name="searchTitle" id="searchTitle">
 				<input type="hidden" id="currEnter" name="enterprise">
-				<div class="input-group" style="width: 70%;">
-				    <input class="form-control" type="text" placeholder="Title Search"
+				<div class="input-group" id="searchBar2" style="width: 60%;">
+				    <input class="form-control" type="text" placeholder="타이틀 검색"
 				    aria-label="Search" id="titleSearch">
-				    <span class="input-group-btn" style="width: 1px;">
-			        	<button class="btn btn-default" type="button" onclick="newsList(1);"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-			        </span>
+				 	<button class="btn btn-default" type="button" onclick="newsList(1);"><i class="fas fa-search" style="color: white;"></i></button>
 				    <!-- &nbsp;<span class="glyphicon glyphicon-search" aria-hidden="true" style="cursor: pointer;"></span> -->
 			    </div>
 			</form>
