@@ -16,13 +16,14 @@
 <body>
 	<div id="header" th:fragment="header">
 		<div class="row" id="headRow" style="background-image: none; background-color: #ffffff;">
-			<a th:href="@{|/main|}" style="text-decoration: none;color: white;"><img class="logo" th:src="@{/images/logo.png}" alt="logo" style="width: 240px; height: 45px;"/></a>
-		</div>
-		<div sec:authorize="hasRole('USER')" style="float: right;">
-			<span style="position: relative;">
-				<span class="glyphicon glyphicon-user" aria-hidden="true"  title="현재 뉴스 스크랩" id="userArea" sec:authentication="name"></span>
-			</span>
-			<a th:href="@{|/logout|}">logout</a>
+			<a th:href="@{|/main|}" style="text-decoration: none; color: white; position: absolute;"><img class="logo" th:src="@{/images/logo.png}" alt="logo" style="width: 240px; height: 45px;"/></a>
+			<div sec:authorize="hasAnyRole('USER, ADMIN')" style="position: absolute; right: 0; margin-right: 2%;">
+				<span style="font-size: 16px;">
+					<i class="fas fa-user-cog"> <b>관리자</b></i>
+					<i class="fas fa-user-alt"> <b>사용자</b></i>
+				</span>
+				<button th:href="@{|/logout|}" style="background-color: #58baed; background-image: none; border: none; border-radius: 3px; color: white; font-size: 12px; margin: 0px 2px; padding: 5px;"><i class="fas fa-sign-out-alt"></i> 로그아웃</button>
+			</div>
 		</div>
 	</div>
 </body>
