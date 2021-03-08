@@ -56,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
 	public void configure(WebSecurity web) throws Exception{
 		web.ignoring()
-		.antMatchers("/css/**", "/fontawesome-free-5.13.0-web/**", "/images/**", "/js/**", "/chartJS/**");
+		.antMatchers("/css/**", "/fonts/**", "/images/**", "/js/**", "/chartJS/**", "/fontawesome/**");
 	}
 
     @Override
