@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.NewsData;
 import com.gridone.scraping.model.NewsMonitoring;
+import com.gridone.scraping.model.SearchBase;
 
 @Mapper
 public interface NewsMonitoringMapper {
@@ -20,5 +21,9 @@ public interface NewsMonitoringMapper {
 	void deleteAll();
 
 	Integer deleteByKeywordId(Keyword param);
+
+	List<?> newsList(SearchBase searchBase);
+
+	Integer newsListCount(SearchBase searchBase);
 
 }

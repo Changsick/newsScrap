@@ -1,6 +1,7 @@
 package com.gridone.scraping.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,8 @@ public class UserService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserModel user = userMapper.selectByLogin(username);
 		if(user == null) {
-			System.out.println("null");
 			throw new UsernameNotFoundException("login fail");
 		}else if(!user.getActive().equals(EnumActive.ACTIVE)) {
-			System.out.println("InActive");
 			throw new UsernameNotFoundException("not ativated user");
 		}
 		return new LoginUserDetails(user);
@@ -62,5 +61,9 @@ public class UserService implements UserDetailsService {
 
 	public UserModel selectUser(String email) {
 		return userMapper.selectByLogin(email);
+	}
+	
+	public List<UserModel> getAllAdmins() {
+		return userMapper.getAllAdmins();
 	}
 }

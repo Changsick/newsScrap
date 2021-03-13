@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org">
 <div th:replace="fragment/includes :: heads"></div>
 
-<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<!-- <script src="https://kit.fontawesome.com/a076d05399.js"></script> -->
 
 </head>
 <style>
@@ -290,7 +290,9 @@
 	}
 	
 	function makeButton(){
-		var button = "<div class='btnDiv'><button onclick='modifyClick(event)'>수정</button><button onclick='deleteKeyword(event)'>삭제</button></div>";
+		var button = "<div class='buttons_2 btnDiv'>"
+			+ "<button onclick='modifyClick(event)' style='width:fit-content;'>수정</button>"
+			+ "<button onclick='deleteKeyword(event)' style='width:fit-content;'>삭제</button></div>";
 		return button;
 	}
 	
@@ -350,7 +352,6 @@
 			};
 			var result = $.post(url, data);
 			result.done(function(data) {
-				console.log('certainNewsInsert data',data);
 				if(data.result){
 					newsList(1);
 					alert("스크랩 완료");
@@ -375,7 +376,6 @@
 		};
 		var result = $.post(url, data);
 		result.done(function(data) {
-			console.log('allNewsInsert data',data);
 			if(data.result){
 				alert("스크랩 완료");
 				newsList(1);
@@ -492,7 +492,7 @@
 			startDate : $("#startDate").val(),
 			endDate : $("#endDate").val()
 		};
-		console.log(data);
+		alert(data.startDate + " 부터" + data.endDate + "까지 뉴스데이터를 발송합니다.\n기간과 데이터 양에 따라 시간이 다소 소요될 수 있습니다.");
 		var result = $.post(url, data);
 		result.done(function(data) {
 			alert('완료');
@@ -550,7 +550,6 @@
 	        var dataLength = $('#enterpriseList').children().length;
 
 	        if(scrollT + scrollH +1 >= contentH && dataLength < enterPageData.totalRecordCount) { // 스크롤바가 아래 쪽에 위치할 때
-	            console.log("hi!");
 	            enterPage ++;
 	            enterpriseList(enterPage, true, false);
 	        }
@@ -654,9 +653,9 @@
 				<input type="date" id="startDate" name="startDate">
 				<label style="line-height: 40px; font-weight: bold; padding: 3px;">~</label>
 				<input type="date" id="endDate" name="endDate">
-				<span id="scrapStatusView" style="display:none;position: relative;cursor: pointer;float: right;top: 5px;">
+			</div>
+			<div id="scrapStatusView" style="display:none;position: relative;">
 				&nbsp;&nbsp;<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" style="color: red;" title="현재 뉴스 스크랩">스크랩중</span>
-				</span>
 			</div>
 			<form class="form-inline d-flex justify-content-center md-form form-sm active-cyan-2 mt-2" name="searchEnterprise" style="margin-top: 2%">
 				<div class="input-group" id="searchBar">

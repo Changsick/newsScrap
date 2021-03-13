@@ -170,4 +170,8 @@ public class KeywordService {
 		return resultVal;
 	}
 
+	public List<Keyword> selectAdmin(LoginUserDetails user) {
+		return keywordMapper.selectAdmin(user);
+	}
+
 }
