@@ -10,6 +10,7 @@ public class ScrapAttribute {
 	private String startDate;
 	private String endDate;
 	private Integer userId;
+	private String emailTo;
 	
 	public Integer getUserId() {
 		return userId;
@@ -35,11 +36,18 @@ public class ScrapAttribute {
 	public void setEndDate(String endDate) {
 		this.endDate = endDate.replaceAll("-", ".");
 	}
+	public String getEmailTo() {
+		return emailTo;
+	}
+	public void setEmailTo(String emailTo) {
+		this.emailTo = emailTo;
+	}
 	@Override
 	public String toString() {
 		return "ScrapAttribute [id=" + id + ", startDate=" + startDate + ", endDate=" + endDate + ", userId=" + userId
-				+ "]";
+				+ ", emailTo=" + emailTo + "]";
 	}
+	
 	
 	
 }
