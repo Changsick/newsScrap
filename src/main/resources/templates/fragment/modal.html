@@ -88,5 +88,42 @@
 		<!-- /.modal-dialog -->
 	</div>
 	<!-- /.modal -->
+	
+	<!--  -->
+	<div id="sendMailUser" th:fragment="sendMailUser" class="modal fade"
+		role="dialog" aria-labelledby="gridSystemModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="gridSystemModalLabel">메일발송</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+					<form id="mailForm">
+						<div class="row">
+							<div class="input-group">
+							  <span class="input-group-addon" id="basic-addon1">메일입력</span>
+							  <input type="text" class="form-control" name="emailTo" id="emailTo">
+							</div>
+						</div>
+					</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="sendMail">Send</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!--  -->
+	
 </body>
 </html>

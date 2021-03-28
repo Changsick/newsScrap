@@ -128,8 +128,9 @@ public class GridoneNewsController {
 	
 	@PostMapping(value = "/sendMail")
 	public @ResponseBody Map<String, Object> sendHistoryMail(ScrapAttribute param){
-		
+		System.out.println("send Mail : "+param);
 		return newsService.sendHistoryMail(param);
+//		return null;
 	}
 	
 	@PostMapping( value = "/checkScrapStatus")

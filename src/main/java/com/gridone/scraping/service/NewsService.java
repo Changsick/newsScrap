@@ -330,7 +330,7 @@ public class NewsService {
 				
 			}
 			
-			sendEmail(sendEmailData, user);
+			sendEmail(sendEmailData, param);
 			
 //			movetoNewsTable(monitoring);
 		} catch (Exception e) {
@@ -339,7 +339,7 @@ public class NewsService {
 		return null;
 	}
 	
-	public void sendEmail(List<SendMinigNews> sendEmailData, LoginUserDetails user) {	
+	public void sendEmail(List<SendMinigNews> sendEmailData, ScrapAttribute user) {	
 		String container = "width: fit-content;";
 		String content = "position: relative;";
 		String content_row = "display: inline-block;max-width: 800px;max-height: 600px;overflow-y: auto;";
@@ -408,7 +408,7 @@ public class NewsService {
 			}
 		}
 		temp.append("</div>");
-		String email = user.getEmail();
+		String email = user.getEmailTo();
 		
 		InternetAddress[] toAddr = new InternetAddress[1];
 		for(int i=0; i<toAddr.length; i++) {
