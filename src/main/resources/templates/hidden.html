@@ -16,6 +16,34 @@
 	*{
 		font-family: 'NanumSquareRound';
 	}
+
+	#headRow {
+		margin: 0;
+		padding: 10px 30px;
+		background-size: 100%;
+		height: 100px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	#footRow {
+		text-align: center;
+		border-top: 2px solid gray;
+/* 		left: 0;
+		bottom: 0; */
+		margin: 0;
+		padding: 10px;
+		width: 100%;
+		height: 100px;
+		/* position: absolute; */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	#footRow p{
+		margin: 0;
+	}
 	
 	::selection{
 	  background: rgba(26,188,156,0.3);
@@ -53,7 +81,13 @@
 </head>
 
 <body>
-	<div id="header" th:include="fragment/header :: header"></div>
+	<div id="header" th:include="fragment/header :: header">
+	
+<<<<<<< HEAD
+=======
+	</div>
+	
+>>>>>>> branch 'master' of https://github.com/Changsick/newsScrap
 	<div class="container">
       <div class="wrapper" th:if="${#authorization.expression('isAdmin()')}">
         <a th:href="@{|/monitoringNews|}" style="text-decoration: none;color: white;"><div class="context"><span>스케줄<br>뉴스 스크랩</span></div></a>
