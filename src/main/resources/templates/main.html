@@ -53,13 +53,9 @@
 </head>
 
 <body>
-<<<<<<< HEAD
-	<div id="header" th:include="fragment/header :: header"></div>
-=======
-	<div id="header" th:include="fragment/header :: header">
-	</div>
 
->>>>>>> refs/remotes/origin/master
+	<div id="header" th:include="fragment/header :: header"></div>
+
 	<div class="container">
       <div class="wrapper" th:if="${#authorization.expression('isAdmin()')}">
         <a th:href="@{|/monitoringNews|}" style="text-decoration: none;color: white;"><div class="context"><span>스케줄<br>뉴스 스크랩</span></div></a>
