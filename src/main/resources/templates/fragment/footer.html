@@ -11,6 +11,29 @@
 <body>
 	<div id="footer" th:fragment="footer">
 <style>
+@media screen and (max-width: 1920px){
+	.footer_pc{
+		font-size: 16px;
+		display: block!important;
+	}
+	.footer_mobile{
+		display: none!important;
+	}
+}
+
+@media screen and (max-width: 768px){
+	.footer_mobile{
+		font-size: 15px;
+		display: block!important;
+	}
+	.footer_pc{
+		display: none!important;
+	}
+	.fInfo{
+		padding-top: 8px;
+	}
+}
+
 footer {
 	background: rgba(0, 0, 0, .75);
 	color: #808080;
@@ -31,8 +54,8 @@ td {
 }
 </style>
 		<footer class="container-fluid py-3 border-top">
-			<div class="container-md" style="margin: 30px auto;">
-				<table border="" style="width: 100%; border: none;">
+			<div class="container-md" style="margin: 14px auto;">
+				<table class="footer_pc" border="" style="width: 100%; border: none;">
 					<tbody>
 						<tr style="width: 100%;">
 							<td style="width: 15%;">
@@ -40,15 +63,16 @@ td {
 									<img src="./images/gridone.png" class="logo-footer" style="height: 45px; width: auto;">
 								</div>
 							</td>
-							<td style="width: 65%;">
+							<td class="fInfo">
 								<div class="d-flex py-1">
 									<p>(주)그리드원</p>
 									<p>&nbsp;|&nbsp;</p>
 									<p>대표자 : 김계관</p>
 								</div>
 								<div class="d-flex py-1">
-									<p>주소 : 서울 특별시 서초구 남부순환로 347길 23(서초동) 유진빌딩 4층</p>
-									<p>&nbsp;|&nbsp;</p>
+									<p>주소 : 서울특별시 서초구 남부순환로 347길 23, 유진빌딩 4층</p>
+								</div>
+								<div class="d-flex py-1">
 									<p>TEL : 02-2058-2220</p>
 									<p>&nbsp;|&nbsp;</p>
 									<p>FAX : 02-2058-2221</p>
@@ -59,12 +83,52 @@ td {
 									<p>서버 개발자 : 송창훈</p>
 								</div>
 							</td>
-							<td style="width: 20%; text-align: right;">
+							<td style="text-align: right;">
 								<div class="contact-us">
 									<a href="https://www.youtube.com/channel/UCUATgGXOlF7g9QjCarzRVUg" target="_blank"><img src="./images/youtube.png" style="height: 45px; width: auto;"></a>
 								</div>
 							</td>
 						</tr>
+					</tbody>
+				</table>
+				<table class="footer_mobile" border="" style="width: 100%; border: none;">
+					<tbody>
+							<tr style="width: 100%;">
+							<td>
+								<div class="logo-part">
+									<img src="./images/gridone.png" class="logo-footer" style="height: 45px; width: auto;">
+								</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="fInfo">
+								<div class="d-flex py-1">
+									<p>(주)그리드원</p>
+									<p>&nbsp;|&nbsp;</p>
+									<p>대표자 : 김계관</p>
+								</div>
+								<div class="d-flex py-1">
+									<p>주소 : 서울특별시 서초구 남부순환로 347길 23, 유진빌딩 4층</p>
+								</div>
+								<div class="d-flex py-1">
+									<p>TEL : 02-2058-2220</p>
+									<p>&nbsp;|&nbsp;</p>
+									<p>FAX : 02-2058-2221</p>
+								</div>
+								<div class="d-flex py-1">
+									<p>프론트엔드 개발자 : 이승민</p>
+									<p>&nbsp;|&nbsp;</p>
+									<p>서버 개발자 : 송창훈</p>
+								</div>
+								</td>
+							</tr>
+							<tr>
+							<td style="text-align: right;">
+								<div class="contact-us">
+									<a href="https://www.youtube.com/channel/UCUATgGXOlF7g9QjCarzRVUg" target="_blank"><img src="./images/youtube.png" style="height: 45px; width: auto;"></a>
+								</div>
+							</td>
+							</tr>
 					</tbody>
 				</table>
 			</div> 

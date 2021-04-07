@@ -3,16 +3,40 @@
 <link rel="stylesheet" href="./css/bootstrap.css">
 	<script src="https://kit.fontawesome.com/e9c6f54b2b.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="./js/matchMedia.js"></script>
+	<script type="text/javascript" src="./js/matchMedia.addListener.js"></script>
 	<script type="text/javascript">
-		window.onload = function(){
+	$(document).ready(function(){
+	        
         $('#enterpriseList>li').click(function(){
+        	$('#enterpriseList>li>span').remove();
+        	$('#enterpriseList>li').css('padding-left', '0px');
         	$('#enterpriseList>li').css('background', 'none');
             $(this).css('background', '#F2DE67');
+            $(this).css('padding-left', '88px');
+            $(this).append($("<span class=\"listButton\"><button>수정</button>&nbsp;<button>삭제</button></span>"));
         });
-		}
+       
+	});
 	</script>
 <style>
-@font-face {
+	@media screen and (max-width: 2560px){
+		#mainForm {min-height: 910px;}
+		.data_mobile {display: none;}
+	}
+	
+	@media screen and (max-width: 1920px){
+		#mainForm {min-height: 680px;}
+		.data_mobile {display: none;}
+	}
+	
+	@media screen and (max-width: 768px){
+		.col-md-7>.row {padding-left: 12px; margin-top: 10px;}
+		.data_pc {display: none;}
+		.data_mobile {display: inline-block!important; padding-right: 12px;}
+	}
+	
+	@font-face {
 	    font-family: 'NanumSquareRound';
 	    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
 	    font-weight: normal;
@@ -34,9 +58,9 @@
 		padding: 5px;
 	}
 	
-	.search-box{
+	/* .search-box{
 		border-top: none;
-	}
+	} */
 	
 	.search-box>input{
 	    width: -webkit-fill-available;
@@ -85,15 +109,62 @@
 		line-height: 69px;
 	}
 	
+	.listButton{
+		position: relative;
+		left: 20%
+	}
+	
+	.listButton>button{
+		border: none;
+		background: rgba(0,0,0,.25);
+		color: white;
+		font-weight: bold;
+		border-radius: 20%;
+		
+	}
+	
+	.goTop {
+		display: block; 
+		position: fixed; 
+		bottom: 35px; /* 탑버튼을 화면의 가장 아래에서 몇 픽셀 떨어뜨릴 것인지 정하세요*/ 
+		right: 30px; /* 탑버튼을 화면의 가장 오른쪽에서 몇 픽셀 떨어뜨릴 것인지 정하세요*/ 
+		z-index: 999;
+		border: none;
+	    width: 30px;
+	    height: 30px;
+	    text-align: center;
+	    line-height: 30px;
+	    color: #ffffff;
+	    border-radius: 50%;
+	    background-color: #f2de67;
+	}
+	
+	.goTop:hover {
+		color: white;
+	}
+	
+	*::-webkit-scrollbar {
+		background-color: #FFFFFF;
+	}
+	
+	*::-webkit-scrollbar-thumb {
+		background-color: #F2DE67;
+		transition: width 2s, height 2s, background-color 2s, transform 2s;
+		-webkit-transition: width 2s, height 2s, background-color 2s, transform 2s;
+	}
+	
+	*::-webkit-scrollbar-track {
+		background-color: #808080;
+	}
 	
 </style>
 </head>
 <body>
 	<div id="header" th:include="fragment/header :: header"></div>
-	<div class="container-md" style="min-height: 680px;">
+	<div class="container-md" id="mainForm">
 		<div class="row p-3">
 			<div class="col-md-5">
-				<div
+				<!-- <div
 					class="timeset d-flex border border-2 justify-content-around align-items-center"
 					style="border-color: #808080 !important;">
 					<div class="before-time d-flex">
@@ -121,10 +192,10 @@
 							</button>
 						</span>
 					</div>
-				</div>
+				</div> -->
 				<div
 					class="search-box d-flex p-2 justify-content-center align-items-center"
-					style="border-left: 2px solid; border-right: 2px solid; border-bottom: 2px solid; border-color: #808080 !important;">
+					style="border: 2px solid; border-color: #808080 !important;">
 					<input class="search-keyword" type="text" placeholder="키워드 검색">
 					<button class="search-button">
 						<i class="fas fa-search"></i>
@@ -145,7 +216,7 @@
 					</div>
 				</div>
 				<div id="enterpriseArea" align="center"
-					style="margin-top: 2px; height: 414px; overflow-y: auto; border: 2px solid #808080;">
+					style="margin-top: 2px; height: 464px; overflow-y: auto; border: 2px solid #808080;">
 					<ul class="" id="enterpriseList">
 						<!-- <li role="presentation" class="active"><a onclick="getNews(1)" href="#">Home</a></li>
 					  <li role="presentation"><a onclick="getNews(2)" href="#">Profile</a></li> -->
@@ -155,10 +226,127 @@
 						<li role="presentation"><a href="#">Test Data</a></li>
 						<li role="presentation"><a href="#">Test Data</a></li>
 						<li role="presentation"><a href="#">Test Data</a></li>
+						<li role="presentation"><a href="#">Test Data</a></li>
+						<li role="presentation"><a href="#">Test Data</a></li>
 					</ul>
 				</div>
 			</div>
-			<div class="col-md-7">7</div>
+			<div class="col-md-7">
+				<div class="row d-flex">
+					<div class="col-7 search-box d-flex p-2 justify-content-center align-items-center" style="border: 2px solid; border-color: #808080 !important;">
+						<input class="search-keyword" type="text" placeholder="타이틀 검색">
+						<button class="search-button">
+							<i class="fas fa-search"></i>
+						</button>
+					</div>
+					<div class="col-5 funcbtn" >
+							<button style="height: 54px!important;">데이터 일괄 삭제</button>
+					</div>
+				</div>
+				<div class="row data_pc" style="width: 738px; height: 586px; margin-top: 8px; overflow-y: scroll;">
+					<table class="table">
+					  <thead class="table-dark" style="line-height: 35px;">
+					    <tr>
+						    <th style="width: 10%">#</th>
+						    <th style="width: 20%">제목</th>
+						    <th style="width: 40%">요약</th>
+						    <th style="width: 15%">언론사</th>
+						    <th style="width: 15%">기사일</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	<tr>
+						    <td>1</td>
+						    <td>하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</td>
+						    <td>디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</td>
+						    <td>디지털투데이</td>
+						    <td>2021-04-07</td>
+					    </tr>
+					    <tr>
+						    <td>2</td>
+						    <td>하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</td>
+						    <td>디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</td>
+						    <td>디지털투데이</td>
+						    <td>2021-04-07</td>
+					    </tr>
+					    <tr>
+						    <td>3</td>
+						    <td>하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</td>
+						    <td>디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</td>
+						    <td>디지털투데이</td>
+						    <td>2021-04-07</td>
+					    </tr>
+					    <tr>
+						    <td>4</td>
+						    <td>하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</td>
+						    <td>디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</td>
+						    <td>디지털투데이</td>
+						    <td>2021-04-07</td>
+					    </tr>
+					    <tr>
+						    <td>5</td>
+						    <td>하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</td>
+						    <td>디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</td>
+						    <td>디지털투데이</td>
+						    <td>2021-04-07</td>
+					    </tr>
+					  </tbody>
+					</table>
+				</div>
+				<div class="row data_mobile">
+					<div class="card" style="border: 2px solid #808080; margin-top: 3px;">
+					  <div class="card-body">
+					    <h5 class="card-title" style="font-weight: bold;">하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</h5>
+					    <p class="card-text" style="margin-bottom: 8px;">디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</p>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">디지털투데이</h6>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">2021-04-07</h6>
+					  </div>
+					</div>
+					<div class="card" style="border: 2px solid #808080; margin-top: 8px;">
+					  <div class="card-body">
+					    <h5 class="card-title" style="font-weight: bold;">하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</h5>
+					    <p class="card-text" style="margin-bottom: 8px;">디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</p>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">디지털투데이</h6>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">2021-04-07</h6>
+					  </div>
+					</div>
+					<div class="card" style="border: 2px solid #808080; margin-top: 8px;">
+					  <div class="card-body">
+					    <h5 class="card-title" style="font-weight: bold;">하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</h5>
+					    <p class="card-text" style="margin-bottom: 8px;">디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</p>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">디지털투데이</h6>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">2021-04-07</h6>
+					  </div>
+					</div>
+					<div class="card" style="border: 2px solid #808080; margin-top: 8px;">
+					  <div class="card-body">
+					    <h5 class="card-title" style="font-weight: bold;">하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</h5>
+					    <p class="card-text" style="margin-bottom: 8px;">디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</p>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">디지털투데이</h6>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">2021-04-07</h6>
+					  </div>
+					</div>
+					<div class="card" style="border: 2px solid #808080; margin-top: 8px;">
+					  <div class="card-body">
+					    <h5 class="card-title" style="font-weight: bold;">하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</h5>
+					    <p class="card-text" style="margin-bottom: 8px;">디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</p>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">디지털투데이</h6>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">2021-04-07</h6>
+					  </div>
+					</div>
+					<div class="card" style="border: 2px solid #808080; margin-top: 8px;">
+					  <div class="card-body">
+					    <h5 class="card-title" style="font-weight: bold;">하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</h5>
+					    <p class="card-text" style="margin-bottom: 8px;">디인포메이션 보도에 따르면 하시코프, 데이터 브릭스, 유아이패스, 삼사라, 콘플루언트 5개 엔터프라이즈 소프트웨어 회사가 상장을 신청했거나 준비 작업에 착수할 것으로 알려지고 있다. …</p>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">디지털투데이</h6>
+					    <h6 class="card-subtitle mb-2 text-muted" style="text-align: right;">2021-04-07</h6>
+					  </div>
+					</div>
+					<span class="d-flex justify-content-end py-2 px-0">
+						<a class="goTop" href="#" title="맨 위로"><i class="fas fa-angle-double-up"></i></a>
+					</span>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div id="footer" th:include="fragment/footer :: footer"></div>
