@@ -1,23 +1,605 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="fragment/includes :: heads"></div>
 <link rel="stylesheet" href="./css/bootstrap.css">
 	<script src="https://kit.fontawesome.com/e9c6f54b2b.js" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script> -->
 	<script type="text/javascript" src="./js/matchMedia.js"></script>
 	<script type="text/javascript" src="./js/matchMedia.addListener.js"></script>
-	<script type="text/javascript">
-	$(document).ready(function(){
-	        
-        $('#enterpriseList>li').click(function(){
+<!-- <li role="presentation" id="{{id}}" onclick="getNews(event, {{id}})" ><a id="text_{{id}}" style="display:inline-block;" onclick='activeCss(event, {{id}})'>{{enterprise}}</a></li> -->
+	<script id="list-template" type="text/x-handlebars-template">
+	{{#resultList}}
+		<li role="presentation" id="{{id}}" onclick="getNews(event, {{id}})"><a id="text_{{id}}">{{enterprise}}</a></li>
+		{{else}} <li role="presentation" >데이터가 없습니다.</li>
+	{{/resultList}}
+	</script>
+	
+	<script id="newsList-template" type="text/x-handlebars-template">
+	{{#resultList}}
+		<tr>
+			<th scope="row">{{math @index "+" 1}}</th>
+			<td><a href="{{link}}">{{title}}</a></td>
+			<td>{{content}}</td>
+			<td>{{formatTime newsdate "YYYY-MM-DD"}}</td>
+			<td>{{press}}</td>
+		</tr>
+		{{else}}<td colspan="5" align="center">데이터가 없습니다.</td>
+	{{/resultList}}
+	</script>
+	
+	<script id="paging-template" type="text/x-handlebars-template">
+   {{rootVar "context" "[[@{/}]]"}}
+   {{#pagination paging.currentPageNo paging.totalPageCount paging.pageSize }}
+      {{#checkPage lastPage}}      
+         {{#if startFromFirstPage}}
+			<li><a href="#" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+         {{else}}
+			<li><a href="#" onclick="newsList({{firstPage}});return false;" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+         {{/if}}
+   
+         {{#if prevShow}}
+			 <li><a href="#" onclick="newsList({{prevPage}});return false;" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+         {{else}}
+			<li><a href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+         {{/if}}
+          {{else}}         
+      {{/checkPage}}
+         {{#each pages}}
+            {{#if isCurrent}}
+				<li class="active"><a>{{page}}</a></li>
+            {{/if}}
+            {{#unless isCurrent}} 
+
+				<li><a href="#" onclick="newsList({{page}});return false;">{{page}}</a></li>  
+            {{/unless}}
+         {{/each}}
+      {{#checkPage lastPage}}
+         {{#if nextShow}}
+			<li><a href="#" onclick="newsList({{nextPage}});return false;" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+         {{else}}
+			<li><a href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+         {{/if}}
+
+         {{#if endAtLastPage}}
+				<li><a href="#" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+         {{else}}
+				<li><a href="#" onclick="newsList({{lastPage}});return false;" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+         {{/if}}
+         {{else}}         
+      {{/checkPage}}
+   {{/pagination}}
+	</script>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var enterpriseListUrl = [[@{|/enterpriseList.json|}]];
+		var newsListUrl = [[@{|/newsList.json|}]];
+		var enterPage = 1;
+		var enterPageData;
+		
+		function enterpriseList(page, isScroll, isFirst){
+			var data = {
+				searchVal : $("#enterpriseSearch").val(), pageNo : page
+			};
+			var result = $.post(enterpriseListUrl,data);
+			result.done(function(data) {
+		    	var source = $("#list-template").html();
+				var template = Handlebars.compile(source);
+				var itemList = template(data);
+				enterPageData = data.paging;
+				if(isScroll){ // 스크롤 시 로드			
+					$('#enterpriseList').append(itemList);
+				}else{
+					$('#enterpriseList').html(itemList);
+				}
+				
+				if(isFirst){
+					if(data.resultList.length != 0){				
+						$("#currEnter").val(data.resultList[0].id);
+					}
+					newsList(1);
+					firstLoadActive();
+					
+				}
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+		}
+		
+		function searchEnter(){
+			enterPage = 1;
+			enterpriseList(enterPage, false, true);
+		}
+			
+		function firstLoadActive(){
+			$('#enterpriseList>li>span').remove();
+        	$('#enterpriseList>li').css('padding-left', '0px');
+        	$('#enterpriseList>li').css('background', 'none');
+			if(enterPageData.totalRecordCount != 0){		
+// 				switchingCss();
+				var firstNode = $("#enterpriseList").children()[0];
+				 $(firstNode).css('background', '#F2DE67');
+	            $(firstNode).css('padding-left', '88px');
+	            $(firstNode).append("<span class=\"listButton\"><button onclick='modifyClick(event)'>수정</button>&nbsp;<button onclick='deleteKeyword(event)'>삭제</button></span>");
+				bindEditModal();
+// 	// 			console.log(firstId);
+// 				$("#"+firstId).append(makeButton());
+			}
+		}
+		
+		function activeCss(e, key_id){
+			e.stopPropagation();
+			switchingCss();
+			 $(e.target).parent('li').addClass('active');
+			 $("#currEnter").val(key_id);
+			 $(e.target).parent('li').append(makeButton());
+			 var form = document.getElementById("searchTitle");
+		    form.reset();
+		    newsList(1);
+		    bindEditModal();
+		}
+		
+		function switchingCss(){
+			$(".btnDiv").remove();
+		    $('.nav li').removeClass('active');
+		}
+		
+		function getNews(e, key_id){
+			e.stopPropagation();
+			var target = e.target.localName == "li" ? e.target : e.target.parentElement;
+					
         	$('#enterpriseList>li>span').remove();
         	$('#enterpriseList>li').css('padding-left', '0px');
         	$('#enterpriseList>li').css('background', 'none');
-            $(this).css('background', '#F2DE67');
-            $(this).css('padding-left', '88px');
-            $(this).append($("<span class=\"listButton\"><button>수정</button>&nbsp;<button>삭제</button></span>"));
-        });
-       
-	});
+            $(target).css('background', '#F2DE67');
+            $(target).css('padding-left', '88px');
+            $(target).append("<span class=\"listButton\"><button onclick='modifyClick(event)'>수정</button>&nbsp;<button onclick='deleteKeyword(event)'>삭제</button></span>");
+
+		    $("#currEnter").val(key_id);
+
+			$("#titleSearch").val("");
+		    newsList(1);
+		    bindEditModal();
+		}
+		
+// 		function makeButton(){
+// 			var button = "<div class='buttons_2 btnDiv'>"
+// 				+ "<button onclick='modifyClick(event)' style='width:fit-content;'>수정</button>"
+// 				+ "<button onclick='deleteKeyword(event)' style='width:fit-content;'>삭제</button></div>";
+// 			return button;
+// 		}
+		
+		function newsList(page){
+			var data = {
+					pageNo : page,
+					searchVal : $("#titleSearch").val(),
+					keyword_id : $("#currEnter").val()
+				};
+		    var result = $.post(newsListUrl, data);
+			result.done(function(data) {
+	// 			console.log('newsList',data);
+		    	var source = $("#newsList-template").html();
+				var template = Handlebars.compile(source);
+				var itemList = template(data);
+				$('#newsList').html(itemList);
+				
+				var page_source = $("#paging-template").html();
+				var page_template = Handlebars.compile(page_source);
+				var page_itemList = page_template(data);
+				$('.pagination').html(page_itemList);
+				$("#pageNo").val(data.paging.currentPageNo);
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+		}
+		
+		function bindEditModal(){
+			var url = [[@{|/getEnterprise.json|}]];
+			var param = {
+				id : $("#currEnter").val()
+			};
+			var result = $.post(url, param);
+			result.done(function(data) {
+				if(data != null && data != undefined){
+					$("#editKeywords").val(data.keywords);
+					$("#editEnterpriseName").val(data.enterprise);
+				}
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+		}
+		
+		function certainNewsInsert(){
+			alert("\""+$("#"+$("#currEnter").val()).children().text()+"\" 키워드로 스크랩합니다."+"\n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
+			var keyId = $("#enterpriseList").find("li[class='active']").attr("id");
+			if(keyId != null && keyId != undefined){
+				var url = [[@{|/certainNewsInsert|}]];
+				var data = {
+					id : keyId,
+					startDate : $("#startDatePicker").val(),
+					endDate : $("#endDatePicker").val()
+				};
+				var result = $.post(url, data);
+				result.done(function(data) {
+					if(data.result){
+						newsList(1);
+						alert("스크랩 완료");
+					}else{
+						alert("실패");
+					}
+			    });
+				result.fail(function(xhr, status, error) {
+					console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+					alert("fail");
+			    });
+				
+			}
+		}
+		
+		function allNewsInsert(){
+			alert("전체 키워드로 스크랩합니다. \n기간설정에 따라 시간이 다소 소요될 수 있습니다.");
+			var url = [[@{|/allNewsInsert|}]];
+			var data = {
+				startDate : $("#startDatePicker").val(),
+				endDate : $("#endDatePicker").val()
+			};
+			var result = $.post(url, data);
+			result.done(function(data) {
+				if(data.result){
+					alert("스크랩 완료");
+					newsList(1);
+				}else{
+					alert(data.msg);
+				}
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+			$("#scrapNewsByDate").modal("hide");
+		}
+		
+		function scrapSetting(){
+			
+			$("#startDatePicker").datepicker({
+				dateFormat: 'yy-mm-dd',
+				defaultDate: new Date(),
+				onSelect: function () {
+		            var dt2 = $('#endDatePicker');
+		            var startDate = $(this).datepicker('getDate');
+		            //add 30 days to selected date
+		            startDate.setDate(startDate.getDate() + 30);
+		            var minDate = $(this).datepicker('getDate');
+		            var dt2Date = dt2.datepicker('getDate');
+		            //difference in days. 86400 seconds in day, 1000 ms in second
+		            var dateDiff = (dt2Date - minDate)/(86400 * 1000);
+
+		            //dt2 not set or dt1 date is greater than dt2 date
+		            if (dt2Date == null || dateDiff < 0) {
+		                    dt2.datepicker('setDate', minDate);
+		            }
+		            //dt1 date is 30 days under dt2 date
+		            else if (dateDiff > 30){
+		                    dt2.datepicker('setDate', startDate);
+		            }
+		            //sets dt2 maxDate to the last day of 30 days window
+		            dt2.datepicker('option', 'maxDate', startDate);
+		            //first day which can be selected in dt2 is selected date in dt1
+		            dt2.datepicker('option', 'minDate', minDate);
+		        }
+			});
+			$("#startDatePicker").val(dateformat(new Date()));
+			$("#endDatePicker").datepicker({
+				dateFormat: 'yy-mm-dd',
+				defaultDate: new Date()
+			});
+			$("#endDatePicker").val(dateformat(new Date()));
+			$("#scrapNewsByDate").modal("show");
+		}
+		
+		function dateformat(date){
+			var year = date.getFullYear();
+			var month = (1 + date.getMonth());
+			month = month < 10 ? "0"+month : month;
+			var day = date.getDate();
+			day = day < 10 ? "0"+day : day;
+			return year + "-" + month + "-" + day;
+		}
+		
+		function dateSetting(){
+			var currDate = new Date();
+			var startDate = new Date(new Date().setDate(currDate.getDate() - 1));
+			$("#startDate").val(dateformat(startDate));
+			$("#endDate").val(dateformat(currDate));
+		}
+		
+		function modifyClick(e){
+			e.stopPropagation();
+			$("#modifySetting").modal("show");
+		}
+		
+		function deleteKeyword(e){
+			e.stopPropagation();
+			var form = document.getElementById("modifyForm");
+			var data = $("form#modifyForm").serializeObject();
+			data.id = $("#currEnter").val();
+			var url = [[@{|/deleteEnterprise.json|}]];
+			var result = $.post(url, data);
+			result.done(function(data) {
+				alert("삭제되었습니다.");
+				enterPage = 1;
+				enterpriseList(enterPage, false, true);
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+			
+			form.reset();
+		}
+		
+		function deleteAll(){
+			var form = document.getElementById("modifyForm");
+			form.reset();
+			var url = [[@{|/deleteEnterpriseAll.json|}]];
+			var result = $.post(url);
+			
+			result.done(function(data) {
+				alert("삭제되었습니다.");
+				enterPage = 1;
+				enterpriseList(enterPage, false, true);
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+		}
+		
+		function getScrapStatus(){
+			var url = [[@{|/checkScrapStatus|}]];
+			
+			var result = $.post(url);
+			result.done(function(data) {
+				if(data){
+					$("#scrapStatusView").css("display","block");
+				}else{
+					$("#scrapStatusView").css("display","none");
+				}
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				$("#scrapStatusView").css("display","none");
+	// 			if(timerId != null){
+	//	 			clearInterval(timerId);
+	//	 		}
+		    });
+			
+		}
+		
+		function deleteNews(){
+			var form = document.getElementById("modifyForm");
+			var data = $("form#modifyForm").serializeObject();
+			data.id = $("#currEnter").val();
+			var url = [[@{|/deleteNewsByKeyword.json|}]];
+			var result = $.post(url, data);
+			result.done(function(data) {
+				alert("삭제되었습니다.");
+				newsList(1);
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+			
+			form.reset();
+		}
+		
+		function sendMail(e){
+			e.stopPropagation();
+			$("#startDate").datepicker({
+				dateFormat: 'yy-mm-dd',
+				defaultDate: new Date(),
+				onSelect: function () {
+		            var dt2 = $('#endDatePicker');
+		            var startDate = $(this).datepicker('getDate');
+		            //add 30 days to selected date
+		            startDate.setDate(startDate.getDate() + 30);
+		            var minDate = $(this).datepicker('getDate');
+		            var dt2Date = dt2.datepicker('getDate');
+		            //difference in days. 86400 seconds in day, 1000 ms in second
+		            var dateDiff = (dt2Date - minDate)/(86400 * 1000);
+
+		            //dt2 not set or dt1 date is greater than dt2 date
+		            if (dt2Date == null || dateDiff < 0) {
+		                    dt2.datepicker('setDate', minDate);
+		            }
+		            //dt1 date is 30 days under dt2 date
+		            else if (dateDiff > 30){
+		                    dt2.datepicker('setDate', startDate);
+		            }
+		            //sets dt2 maxDate to the last day of 30 days window
+		            dt2.datepicker('option', 'maxDate', startDate);
+		            //first day which can be selected in dt2 is selected date in dt1
+		            dt2.datepicker('option', 'minDate', minDate);
+		        }
+			});
+			$("#startDate").val(dateformat(new Date()));
+			$("#endDate").datepicker({
+				dateFormat: 'yy-mm-dd',
+				defaultDate: new Date()
+			});
+			$("#endDate").val(dateformat(new Date()));
+			$("#sendMailUser").modal("show");
+		}
+		
+		function isEmail(email){
+			var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+			return regExp.test(email);
+		}
+		
+		var timerId = null;
+		$(function(){
+			
+			enterpriseList(1, false, true);
+			
+// 			$('#enterpriseList>li').click(function(){
+// 				console.log(this);
+// 	        	$('#enterpriseList>li>span').remove();
+// 	        	$('#enterpriseList>li').css('padding-left', '0px');
+// 	        	$('#enterpriseList>li').css('background', 'none');
+// 	            $(this).css('background', '#F2DE67');
+// 	            $(this).css('padding-left', '88px');
+// 	            $(this).append($("<span class=\"listButton\"><button>수정</button>&nbsp;<button>삭제</button></span>"));
+// 	        });
+			
+			dateSetting();
+			getScrapStatus();
+			timerId = setInterval(getScrapStatus, 1000);
+	// 		
+			$(document).keypress(function(event){
+				if(event.which == 13){
+					event.preventDefault();
+				}
+			});
+			
+			$("#enterpriseSearch").keypress(function(event){
+				if(event.which == 13){				
+					searchEnter();
+				}
+			});
+			
+			$("#titleSearch").keypress(function(event){
+				if(event.which == 13){				
+					newsList(1);
+				}
+			});
+			
+			$("#add").click(function(){
+				$("#addEnterprise").modal("show");
+			});
+			
+			$("#modify").click(function(e){
+				e.stopPropagation();
+				$("#modifySetting").modal("show");
+			});
+			
+			$("#enterpriseArea").scroll(function(){
+				var scrollT = $(this).scrollTop(); //스크롤바의 상단위치
+		        var scrollH = $(this).height(); //스크롤바를 갖는 div의 높이
+		        var contentH = $('#enterpriseList').height(); //문서 전체 내용을 갖는 div의 높이
+		        var dataLength = $('#enterpriseList').children().length;
+	
+		        if(scrollT + scrollH +1 >= contentH && dataLength < enterPageData.totalRecordCount) { // 스크롤바가 아래 쪽에 위치할 때
+		            enterPage ++;
+		            enterpriseList(enterPage, true, false);
+		        }
+		        /* if(scrollT == 0){
+		        	if(enterPage > 1){
+		        		console.log("down");
+		        		enterPage --;
+		        		enterpriseList(enterPage, true, false);
+		        	}
+		        } */
+			});
+			
+			$("#addSave").click(function(){
+				var form = document.getElementById("addForm");
+				var data = $("form#addForm").serializeObject();
+				var url = [[@{|/addEnterprise.json|}]];
+				
+				if(data.enterprise.length == 0){
+					alert("검색어를 입력해주세요");
+					$("input[name='enterprise']").focus();
+					return false;
+				}
+				
+				var result = $.post(url, data);
+				result.done(function(data) {
+					alert("저장되었습니다.");
+					enterPage = 1;
+					enterpriseList(enterPage, false, true);
+			    });
+				result.fail(function(xhr, status, error) {
+					console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+					alert("fail");
+			    });
+				$("#addEnterprise").modal("hide");
+				form.reset();
+				
+			});
+			
+			$("#modifySave").click(function(){
+				var form = document.getElementById("modifyForm");
+				var data = $("form#modifyForm").serializeObject();
+				data.id = $("#currEnter").val();
+				var url = [[@{|/modifyEnterprise.json|}]];
+				var result = $.post(url, data);
+				result.done(function(data) {
+					alert("저장되었습니다.");
+					bindEditModal();
+					var textId = $("#"+$("#currEnter").val()).children()[0].getAttribute("id");
+					$("#"+textId).text(data.enterprise);
+	// 				$("#"+$("#currEnter").val()).children()[0].text(data.enterprise);
+			    });
+				result.fail(function(xhr, status, error) {
+					console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+					alert("fail");
+			    });
+				$("#modifySetting").modal("hide");
+				form.reset();
+			});
+			
+			$("#deleteSave").click(function(){
+				var form = document.getElementById("modifyForm");
+				var data = $("form#modifyForm").serializeObject();
+				data.id = $("#currEnter").val();
+				var url = [[@{|/deleteEnterprise.json|}]];
+				var result = $.post(url, data);
+				result.done(function(data) {
+					alert("삭제되었습니다.");
+					enterPage = 1;
+					enterpriseList(enterPage, false, true);
+			    });
+				result.fail(function(xhr, status, error) {
+					console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+					alert("fail");
+			    });
+				$("#modifySetting").modal("hide");
+				form.reset();
+			});
+			
+			$("#sendMail").click(function(){
+				var url = [[@{|/sendMail|}]];
+				var data = $("form#mailForm").serializeObject();
+				var form = document.getElementById("mailForm");
+				data.startDate = $("#startDate").val();
+				data.endDate = $("#endDate").val();
+				if(isEmail(data.emailTo)){				
+			 		alert(data.startDate + " 부터" + data.endDate + "까지 뉴스데이터를 발송합니다.\n기간과 데이터 양에 따라 시간이 다소 소요될 수 있습니다.");
+			 		var result = $.post(url, data);
+			 		result.done(function(data) {
+			 			alert('완료');
+			 	    });
+			 		result.fail(function(xhr, status, error) {
+			 			console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+			 			alert("fail");
+			 	    });
+					$("#sendMailUser").modal("hide");
+					form.reset();
+				}else{
+					alert("이메일 형식을 확인해주세요");
+					$("#emailTo").focus();
+				}
+			});
+			
+		})
+		/*]]>*/
 	</script>
 <style>
 	@media screen and (max-width: 2560px){
@@ -156,7 +738,9 @@
 	*::-webkit-scrollbar-track {
 		background-color: #808080;
 	}
-	
+	.ui-datepicker .ui-widget .ui-widget-content .ui-helper-clearfix .ui-corner-all{
+		z-index: 9999;
+	}
 </style>
 </head>
 <body>
@@ -196,23 +780,23 @@
 				<div
 					class="search-box d-flex p-2 justify-content-center align-items-center"
 					style="border: 2px solid; border-color: #808080 !important;">
-					<input class="search-keyword" type="text" placeholder="키워드 검색">
-					<button class="search-button">
+					<input class="search-keyword" type="text" placeholder="키워드 검색" id="enterpriseSearch">
+					<button class="search-button" onclick="searchEnter()">
 						<i class="fas fa-search"></i>
 					</button>
 				</div>
 				<div class="row g-2 py-2">
 					<div class="col-6 funcbtn">
-						<button>키워드 입력</button>
+						<button id="add">키워드 입력</button>
 					</div>
 					<div class="col-6 funcbtn">
-						<button>키워드 일괄 삭제</button>
+						<button onclick="deleteAll()">키워드 일괄 삭제</button>
 					</div>
 					<div class="col-6 funcbtn">
-						<button>스크랩 시작</button>
+						<button onclick="scrapSetting()">스크랩 시작</button> <!-- onclick="allNewsInsert()" -->
 					</div>
 					<div class="col-6 funcbtn">
-						<button>메일 발송</button>
+						<button onclick="sendMail(event)">메일 발송</button>
 					</div>
 				</div>
 				<div id="enterpriseArea" align="center"
@@ -234,13 +818,14 @@
 			<div class="col-md-7">
 				<div class="row d-flex">
 					<div class="col-7 search-box d-flex p-2 justify-content-center align-items-center" style="border: 2px solid; border-color: #808080 !important;">
-						<input class="search-keyword" type="text" placeholder="타이틀 검색">
-						<button class="search-button">
+						<input type="hidden" id="currEnter" name="enterprise">
+						<input class="search-keyword" type="text" id="titleSearch" placeholder="타이틀 검색">
+						<button class="search-button" onclick="newsList(1)">
 							<i class="fas fa-search"></i>
 						</button>
 					</div>
 					<div class="col-5 funcbtn" >
-							<button style="height: 54px!important;">데이터 일괄 삭제</button>
+							<button style="height: 54px!important;" onclick="deleteNews()">데이터 일괄 삭제</button>
 					</div>
 				</div>
 				<div class="row data_pc" style="width: 738px; height: 586px; margin-top: 8px; overflow-y: scroll;">
@@ -254,7 +839,7 @@
 						    <th style="width: 15%">기사일</th>
 					    </tr>
 					  </thead>
-					  <tbody>
+					  <tbody id="newsList">
 					  	<tr>
 						    <td>1</td>
 						    <td>하시코프부터 데이터 브릭스까지...해외 B2B 스타트업 상장 행보 관심집중</td>
@@ -292,6 +877,14 @@
 					    </tr>
 					  </tbody>
 					</table>
+					<input type="hidden" id="pageNo" name="pageNo"/>
+					<div id="newsPage" align="center"> 
+						<nav>
+						  <ul class="pagination">
+						    
+						  </ul>
+						</nav>
+					</div>
 				</div>
 				<div class="row data_mobile">
 					<div class="card" style="border: 2px solid #808080; margin-top: 3px;">
@@ -349,6 +942,10 @@
 			</div>
 		</div>
 	</div>
+	<div th:replace="fragment/modal :: addEnterprise"></div>
+	<div th:replace="fragment/modal :: modifySetting"></div>
+	<div th:replace="fragment/modal :: sendMailUser"></div>
+	<div th:replace="fragment/modal :: scrapNewsByDate"></div>
 	<div id="footer" th:include="fragment/footer :: footer"></div>
 	<script type="text/javascript" src="./js/bootstrap.js"></script>
 </body>

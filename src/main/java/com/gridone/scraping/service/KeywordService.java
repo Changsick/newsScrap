@@ -41,7 +41,7 @@ public class KeywordService {
 	NewsMonitoringMapper monitoringMapper;
 	
 	public ResultList selectSearchList(SearchBase searchBase) {
-		searchBase.setRecordCountPerPage(20);
+//		searchBase.setRecordCountPerPage(20);
 		ResultList resultList = null;
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();

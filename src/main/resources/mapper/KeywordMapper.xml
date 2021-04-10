@@ -13,8 +13,10 @@
 		SELECT ID, USERID, ENTERPRISE, KEYWORDS
 		FROM tb_keywords
 		WHERE 
-		 USERID = #{userId} 	AND 
-		ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		 USERID = #{userId} 	
+		 <if test="searchVal != null and searchVal != ''">
+			AND ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		 </if>
 		LIMIT #{firstIndex} , #{recordCountPerPage} 
   	</select>
   	
@@ -22,8 +24,10 @@
 		SELECT count(*)
 		FROM tb_keywords
 		WHERE 
-		 USERID = #{userId} 	AND 
-		ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		 USERID = #{userId} 	
+		 <if test="searchVal != null and searchVal != ''">
+			AND ENTERPRISE like CONCAT('%',#{searchVal},'%')
+		 </if>
   	</select>
 
 	<select id="selectAll" resultMap="BaseResultMap">
