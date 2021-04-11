@@ -9,6 +9,7 @@
 		<result column="TOP5" jdbcType="INTEGER" property="top5" />				
 		<result column="WORDCLOUD" jdbcType="VARCHAR" property="wordCloud" />
 		<result column="NEWS_DATE" jdbcType="TIMESTAMP" property="newsDate" />
+		<result column="REGISTER_DATE" jdbcType="TIMESTAMP" property="registerDate" />
 	</resultMap>
   	
   	<select id="getMiningDataByUserIds" parameterType="Integer" resultMap="BaseResultMap">
@@ -19,7 +20,7 @@
   	</select>
   	
   	<select id="getMiningDataByUserId" parameterType="Integer" resultMap="BaseResultMap">
-  		SELECT ID, USERID, KEYWORD_ID, TOP5, WORDCLOUD, MAX(NEWS_DATE) as NEWS_DATE
+  		SELECT ID, USERID, KEYWORD_ID, TOP5, WORDCLOUD, MAX(NEWS_DATE) as NEWS_DATE, REGISTER_DATE
   		FROM tb_textmining
   		WHERE USERID = #{userId}
   	</select>

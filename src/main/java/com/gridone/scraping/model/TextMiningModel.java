@@ -10,6 +10,7 @@ public class TextMiningModel {
 	private String top5;
 	private String wordCloud;
 	private Date newsDate;
+	private Date registerDate;
 	public Integer getId() {
 		return id;
 	}
@@ -46,12 +47,17 @@ public class TextMiningModel {
 	public void setNewsDate(Date newsDate) {
 		this.newsDate = newsDate;
 	}
+	
+	public Date getRegisterDate() {
+		return registerDate;
+	}
+	public void setRegisterDate(Date registerDate) {
+		this.registerDate = registerDate;
+	}
 	@Override
 	public String toString() {
 		return "TextMiningModel [id=" + id + ", userId=" + userId + ", keywordId=" + keywordId + ", top5=" + top5
-				+ ", wordCloud=" + wordCloud + ", newsDate=" + newsDate + "]";
+				+ ", wordCloud=" + wordCloud + ", newsDate=" + newsDate + ", registerDate=" + registerDate + "]";
 	}
 	
-	
-
 }

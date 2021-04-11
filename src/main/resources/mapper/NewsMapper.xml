@@ -61,7 +61,6 @@
 		FROM tb_news n left join tb_keywords k on n.KEYWORD_ID = k.ID
 		WHERE k.USERID = #{userId}
 		 AND n.NEWSDATE >= #{startDate} and n.NEWSDATE <= #{endDate}
-		ORDER BY NEWSDATE DESC
 		]]>
 	</select>
 	
@@ -71,7 +70,7 @@
 		FROM tb_news n left join tb_keywords k on n.KEYWORD_ID = k.ID
 		WHERE k.USERID = #{userId}
 		 AND n.NEWSDATE > #{startDate} and n.NEWSDATE <= #{endDate}
-		ORDER BY NEWSDATE DESC
+		ORDER BY KEYWORD_ID, NEWSDATE DESC
 		]]>
 	</select>
 
