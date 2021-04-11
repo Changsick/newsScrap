@@ -70,7 +70,7 @@ public class ScheduleController {
 		mails.forEach(a -> newsMonitoringService.monitoringSendEmail(a.getUserId()));
 	}
 	
-	@Scheduled(cron = "0 0/1 * 1/1 * ?")
+	@Scheduled(cron = "0 0 0 1/1 * ?")
 //	@RequestMapping(value = "/testtest")
 	public void textmining() {
 		System.err.println("#####textmining######");
