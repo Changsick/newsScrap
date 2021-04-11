@@ -281,9 +281,11 @@ public class NewsMonitoringService {
 		return resultData;
 	}
 	
-	public void monitoringSendEmail() {
-		
-		List<NewsMonitoring> monitoring = newsMonitoringMapper.getMonitoringNews();
+	public void monitoringSendEmail(Integer userId) {
+		if(userId == null) {
+			return;
+		}
+		List<NewsMonitoring> monitoring = newsMonitoringMapper.getMonitoringNews(userId);
 		System.out.println("monitoring : "+monitoring);
 		System.out.println("monitoring size : "+monitoring.size());
 		List<SendMinigNews> sendEmailData = new ArrayList<>();
@@ -325,7 +327,7 @@ public class NewsMonitoringService {
 			
 			sendEmail(sendEmailData);
 			
-//			movetoNewsTable(monitoring);
+			movetoNewsTable(monitoring);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

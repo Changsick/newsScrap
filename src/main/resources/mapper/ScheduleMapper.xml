@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gridone.scraping.mapper.ScheduleMapper">
+	
+	<resultMap type="com.gridone.scraping.model.ScheduleModel" id="BaseResultMap">
+		<id column="ID" jdbcType="INTEGER" property="id" />
+		<result column="USERID" jdbcType="INTEGER" property="userId" />
+		<result column="TYPE" jdbcType="VARCHAR" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" property="type" />		
+		<result column="CRON" jdbcType="VARCHAR" property="cron" />
+		<result column="NEXTTIME" jdbcType="TIMESTAMP" property="nextTime" />
+	</resultMap>
+  	
+  	<!-- <insert id="insertUser" parameterType="com.gridone.scraping.model.UserModel">
+  		insert into tb_user (EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, PASSWORD_CHANGE)
+  		values(
+  			#{email}, #{password}, #{name}, #{phone}, #{active,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, 
+  			#{role,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},#{passwordFailCnt}, #{changeDt}
+  		)
+  	</insert> -->
+  	
+  	<insert id="insertMailSchedule" parameterType="com.gridone.scraping.model.ScheduleModel">
+  		INSERT INTO tb_schedule (USERID, TYPE, CRON, NEXTTIME)
+		SELECT #{userId}, #{type,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{cron}, #{nextTime} FROM dual
+		WHERE NOT EXISTS (
+		    SELECT * FROM tb_schedule WHERE userId = #{userId} and type = 0
+		)
+  	</insert>
+  	
+  	<insert id="insertTextminingSchedule" parameterType="com.gridone.scraping.model.ScheduleModel">
+  		INSERT INTO tb_schedule (USERID, TYPE, CRON, NEXTTIME)
+		SELECT #{userId}, #{type,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{cron}, #{nextTime} FROM dual
+		WHERE NOT EXISTS (
+		    SELECT * FROM tb_schedule WHERE userId = #{userId} and type = 1
+		)
+  	</insert>
+  	
+  	<update id="updateSchedule" parameterType="com.gridone.scraping.model.ScheduleModel">
+  		UPDATE tb_schedule
+  		SET CRON = #{cron},
+  		NEXTTIME = #{nextTime}
+  		WHERE ID = #{id}
+  	</update>
+  	
+  	<select id="getCurrNextTime" parameterType="java.lang.String" resultMap="BaseResultMap">
+  		SELECT ID, USERID, TYPE, CRON, NEXTTIME
+  		FROM tb_schedule
+  		WHERE NEXTTIME = #{date,jdbcType=VARCHAR}
+  	</select>
+  	
+</mapper>

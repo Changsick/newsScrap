@@ -26,9 +26,10 @@
 		WHERE n.KEYWORD_ID = #{keywordId}
 	</select>
 
-	<select id="getMonitoringNews" resultMap="BaseResultMap">
+	<select id="getMonitoringNews" parameterType="java.lang.Integer" resultMap="BaseResultMap">
 		SELECT *
 		FROM tb_monitoring_news n left join tb_keywords k on n.KEYWORD_ID = k.ID
+		WHERE k.USERID = #{userId}
 		order by n.KEYWORD_ID
 	</select>
 	

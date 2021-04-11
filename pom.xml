@@ -156,6 +156,13 @@
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-quartz</artifactId>
 		</dependency>
+		
+		<dependency>
+		    <groupId>com.cronutils</groupId>
+		    <artifactId>cron-utils</artifactId>
+		    <version>9.1.5</version>
+		</dependency>
+		
 	</dependencies>
 
 	<!-- <build>

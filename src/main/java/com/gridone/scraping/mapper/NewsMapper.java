@@ -27,4 +27,6 @@ public interface NewsMapper {
 
 	List<NewsData> getNewsForMail(ScrapAttribute param);
 
+	List<NewsData> getNewsForMining(ScrapAttribute param);
+
 }

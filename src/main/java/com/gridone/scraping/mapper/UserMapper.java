@@ -16,5 +16,7 @@ public interface UserMapper {
 
 	List<UserModel> getAllAdmins();
 
+	List<UserModel> getUsers();
+
 
 }

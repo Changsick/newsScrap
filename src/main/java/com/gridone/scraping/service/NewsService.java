@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.NewsMapper;
+import com.gridone.scraping.mapper.TextMiningMapper;
 import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.LoginUserDetails;
 import com.gridone.scraping.model.NewsData;
@@ -31,6 +32,7 @@ import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.ScrapAttribute;
 import com.gridone.scraping.model.SearchBase;
 import com.gridone.scraping.model.SendMinigNews;
+import com.gridone.scraping.model.TextMiningModel;
 import com.gridone.scraping.wordcloud.WordCount;
 
 @Service
@@ -56,6 +58,9 @@ public class NewsService {
 	
 	@Autowired
 	MailClient mailClient;
+	
+	@Autowired
+	TextMiningMapper textMiningMapper;
 	
 	public void getNewsScraping(String item, Keyword k, ScrapAttribute param, int interval) {
 		String sendUrl =  null;
@@ -337,6 +342,96 @@ public class NewsService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public void textmining(ScrapAttribute param) {
+		
+		List<NewsData> monitoring = newsMapper.getNewsForMining(param);
+		System.out.println("monitoring size : "+monitoring.size());
+		List<SendMinigNews> sendEmailData = new ArrayList<>();
+		try {
+			if(monitoring != null && monitoring.size() > 0) {
+				List<NewsData> sendData = null;
+				
+				List<String> title = new ArrayList<>();
+				List<String> content = new ArrayList<>();
+				
+				int idx = 0;
+				for(int i=0; i<monitoring.size(); i++) {
+					
+					title.add(monitoring.get(i).getTitle()+" ");
+					content.add(monitoring.get(i).getContent()+" ");
+					if(i > 0 && !( monitoring.get(i).getKeywordId().equals(monitoring.get(i-1).getKeywordId())) ) {
+						SendMinigNews tempData = new SendMinigNews();
+						sendData = new ArrayList<>(monitoring.subList(idx, i));
+						HashMap<String, Object> textmining = monitoringService.setWordCount(title.subList(idx, i).toString(), content.subList(idx, i).toString());
+						tempData.setEnterprise(monitoring.get(i-1).getEnterprise());
+						tempData.setMiningText(textmining);
+						tempData.setNewsList(sendData);
+						sendEmailData.add(tempData);
+						idx = i;
+					}
+					
+					if(i == monitoring.size()-1) {
+						SendMinigNews tempData = new SendMinigNews();
+						sendData = new ArrayList<>(monitoring.subList(idx, i+1));
+						HashMap<String, Object> textmining = monitoringService.setWordCount(title.subList(idx, i+1).toString(), content.subList(idx, i+1).toString());
+						tempData.setEnterprise(monitoring.get(i).getEnterprise());
+						tempData.setMiningText(textmining);
+						tempData.setNewsList(sendData);
+						sendEmailData.add(tempData);
+					}
+				}
+				
+			}
+			
+			insertMiningData(sendEmailData, param);
+			
+//			movetoNewsTable(monitoring);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		return null;
+	}
+	
+	public void insertMiningData(List<SendMinigNews> sendEmailData, ScrapAttribute param) {
+		System.err.println("####insertMiningData#####");
+		if(sendEmailData == null || sendEmailData.size() == 0) {
+			return;
+		}
+		try {
+			
+			for (SendMinigNews s : sendEmailData) {
+				
+				List<NewsData> list = (List<NewsData>)s.getNewsList();
+				
+				String wordcloud = s.getMiningText().get("contentImage").toString();
+				Integer keywordId = list.get(0).getKeywordId();
+				
+				List<WordCount> top5List = (List<WordCount>)s.getMiningText().get("content");
+				String top5 = top5List.toString();
+				
+				Date newsDate = list.get(0).getNewsdate();
+				Integer userId = param.getUserId();
+				
+				TextMiningModel data = new TextMiningModel();
+				data.setKeywordId(keywordId);
+				data.setTop5(top5);
+				data.setNewsDate(newsDate);
+				data.setWordCloud(wordcloud);
+				data.setUserId(userId);
+				
+				textMiningMapper.insert(data);
+				
+//				System.out.println(wordcloud.substring(0,50));
+//				System.out.println("keywordId : "+keywordId);
+//				System.out.println("top5 : "+top5);
+//				System.out.println("newsDate : "+newsDate);
+//				System.out.println("userId : "+userId);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void sendEmail(List<SendMinigNews> sendEmailData, ScrapAttribute user) {	

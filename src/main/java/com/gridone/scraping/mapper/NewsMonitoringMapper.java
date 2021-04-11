@@ -16,7 +16,7 @@ public interface NewsMonitoringMapper {
 
 	void insertNewsMonitoring(NewsMonitoring news);
 
-	List<NewsMonitoring> getMonitoringNews();
+	List<NewsMonitoring> getMonitoringNews(Integer userId);
 
 	void deleteAll();
 

@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.UserMapper;
 import com.gridone.scraping.model.LoginUserDetails;
+import com.gridone.scraping.model.ScheduleModel;
 import com.gridone.scraping.model.UserModel;
 import com.gridone.scraping.type.EnumActive;
+import com.gridone.scraping.type.EnumScheduleType;
 import com.gridone.scraping.type.EnumUserRole;
 
 @Service
@@ -27,6 +29,12 @@ public class UserService implements UserDetailsService {
 	
 	@Autowired
 	UserMapper userMapper;
+	
+	@Autowired
+	ScheduleService scheduleService;
+	
+	private static String DEFAULTCRON = "0 0 9 ? * FRI *";
+	private static String MININGCRON = "0 0 0 ? * FRI *";
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -49,6 +57,14 @@ public class UserService implements UserDetailsService {
 			um.setActive(EnumActive.ACTIVE);
 			um.setPasswordFailCnt(0);
 			userMapper.insertUser(um);
+			
+			ScheduleModel textminingSchedule = new ScheduleModel();
+			textminingSchedule.setCron(DEFAULTCRON);
+			textminingSchedule.setUserId(um.getId());
+			textminingSchedule.setType(EnumScheduleType.TEXTMINING);
+			textminingSchedule.setNextTime(scheduleService.checkNextTime(DEFAULTCRON));
+			scheduleService.insertTextminingSchedule (textminingSchedule);
+			
 			state_ok = 0;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,5 +81,9 @@ public class UserService implements UserDetailsService {
 	
 	public List<UserModel> getAllAdmins() {
 		return userMapper.getAllAdmins();
+	}
+
+	public List<UserModel> getUsers() {
+		return userMapper.getUsers();
 	}
 }

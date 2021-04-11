@@ -47,10 +47,10 @@ public class NewsMonitoringController {
 	}
 	
 //	@Scheduled(cron="0 30 8 ? * *") 
-	@Scheduled(cron="0 30 8 ? * FRI") 
-	public void monitoringSendEmail() {
-		newsMonitoringService.monitoringSendEmail();
-	}
+//	@Scheduled(cron="0 30 8 ? * FRI") 
+//	public void monitoringSendEmail() {
+//		newsMonitoringService.monitoringSendEmail();
+//	}
 	
 	@PreAuthorize("isAdmin()")
 	@GetMapping(value = "/monitoringNews")

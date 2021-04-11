@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gridone.scraping.mapper.TextMiningMapper">
+	
+	<resultMap type="com.gridone.scraping.model.TextMiningModel" id="BaseResultMap">
+		<id column="ID" jdbcType="INTEGER" property="id" />
+		<result column="USERID" jdbcType="INTEGER" property="userId" />
+		<result column="KEYWORD_ID" jdbcType="INTEGER" property="keywordId" />
+		<result column="TOP5" jdbcType="INTEGER" property="top5" />				
+		<result column="WORDCLOUD" jdbcType="VARCHAR" property="wordCloud" />
+		<result column="NEWS_DATE" jdbcType="TIMESTAMP" property="newsDate" />
+	</resultMap>
+  	
+  	<select id="getMiningDataByUserIds" parameterType="Integer" resultMap="BaseResultMap">
+  		SELECT ID, USERID, KEYWORD_ID, TOP5, WORDCLOUD, MAX(NEWS_DATE) as NEWS_DATE
+  		FROM tb_textmining
+  		WHERE USERID IN
+  			<foreach item="item" index="index" collection="userIds" open="(" separator="," close=")">#{item}	</foreach>
+  	</select>
+  	
+  	<select id="getMiningDataByUserId" parameterType="Integer" resultMap="BaseResultMap">
+  		SELECT ID, USERID, KEYWORD_ID, TOP5, WORDCLOUD, MAX(NEWS_DATE) as NEWS_DATE
+  		FROM tb_textmining
+  		WHERE USERID = #{userId}
+  	</select>
+  	
+  	<insert id="insert" parameterType="com.gridone.scraping.model.TextMiningModel">
+  		INSERT INTO tb_textmining(USERID, KEYWORD_ID, TOP5, WORDCLOUD, NEWS_DATE)
+  		VALUES(#{userId}, #{keywordId}, #{top5}, #{wordCloud}, #{newsDate})
+  	</insert>
+  	
+</mapper>
