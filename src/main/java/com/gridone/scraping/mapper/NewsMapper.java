@@ -29,4 +29,8 @@ public interface NewsMapper {
 
 	List<NewsData> getNewsForMining(ScrapAttribute param);
 
+	Integer newsListByNewsDateCount(SearchBase searchBase);
+
+	List<NewsData> newsListByNewsDate(SearchBase searchBase);
+
 }

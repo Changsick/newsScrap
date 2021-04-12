@@ -15,9 +15,11 @@ import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.ScrapAttribute;
 import com.gridone.scraping.model.SearchBase;
+import com.gridone.scraping.model.TextMiningModel;
 import com.gridone.scraping.service.KeywordService;
 import com.gridone.scraping.service.NewsMonitoringService;
 import com.gridone.scraping.service.NewsService;
+import com.gridone.scraping.service.TextMiningService;
 
 @Controller
 public class GridoneNewsController {
@@ -30,6 +32,9 @@ public class GridoneNewsController {
 	
 	@Autowired
 	NewsMonitoringService newsMonitoringService;
+	
+	@Autowired
+	TextMiningService textMiningService;
 
 	@RequestMapping("/dailyNews")
 	public String dailyNews() {
@@ -141,6 +146,16 @@ public class GridoneNewsController {
 	@PostMapping(value = "/deleteNewsByKeyword.json")
 	public @ResponseBody Map<String, Object> deleteNewsByKeyword(Keyword param){
 		return newsService.deleteNewsByKeyword(param);
+	}
+	
+	@PostMapping(value = "/textminingData.json")
+	public @ResponseBody Map<String, Object> textminingData(TextMiningModel param){
+		return textMiningService.textminingData(param);
+	}
+	
+	@PostMapping(value = "/getNewsByNewsDate.json")
+	public @ResponseBody ResultList getNewsByNewsDate(@ModelAttribute("searchBaseNews") SearchBase searchBase){
+		return newsService.getNewsByNewsDate(searchBase);
 	}
 	
 }

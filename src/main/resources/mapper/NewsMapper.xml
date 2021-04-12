@@ -73,5 +73,33 @@
 		ORDER BY KEYWORD_ID, NEWSDATE DESC
 		]]>
 	</select>
+	
+	<select id="newsListByNewsDate" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
+		SELECT NEWS_ID, KEYWORD_ID, TITLE, CONTENT, LINK, REGITDATE, NEWSDATE, PRESS
+		FROM tb_news
+		WHERE  KEYWORD_ID = #{keyword_id}
+		<if test="startDate != null">
+			AND NEWSDATE <![CDATA[ >= ]]> #{startDate}
+		</if>
+		AND NEWSDATE <![CDATA[ <= ]]> #{endDate}
+		<if test="searchVal != null and searchVal != ''">
+			AND TITLE like CONCAT('%',#{searchVal},'%')
+		</if>
+		order by NEWSDATE desc
+		LIMIT #{firstIndex} , #{recordCountPerPage}
+	</select>
+	
+	<select id="newsListByNewsDateCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
+		SELECT count(*)
+		FROM tb_news
+		WHERE  KEYWORD_ID = #{keyword_id}
+		<if test="startDate != null">
+			AND NEWSDATE <![CDATA[ >= ]]> #{startDate}
+		</if>
+		AND NEWSDATE <![CDATA[ <= ]]> #{endDate}
+		<if test="searchVal != null and searchVal != ''">
+			AND TITLE like CONCAT('%',#{searchVal},'%')
+		</if>
+	</select>
 
 </mapper>

@@ -1,6 +1,7 @@
 package com.gridone.scraping.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class TextMiningModel {
 	
@@ -11,6 +12,8 @@ public class TextMiningModel {
 	private String wordCloud;
 	private Date newsDate;
 	private Date registerDate;
+	private List<String> top5Names;
+	private List<String> top5Cnt;
 	public Integer getId() {
 		return id;
 	}
@@ -53,6 +56,18 @@ public class TextMiningModel {
 	}
 	public void setRegisterDate(Date registerDate) {
 		this.registerDate = registerDate;
+	}
+	public List<String> getTop5Names() {
+		return top5Names;
+	}
+	public void setTop5Names(List<String> top5Names) {
+		this.top5Names = top5Names;
+	}
+	public List<String> getTop5Cnt() {
+		return top5Cnt;
+	}
+	public void setTop5Cnt(List<String> top5Cnt) {
+		this.top5Cnt = top5Cnt;
 	}
 	@Override
 	public String toString() {

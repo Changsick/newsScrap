@@ -517,4 +517,17 @@ public class NewsService {
 		mailClient.prepareAndSend(toAddr, temp.toString());
 	}
 
+	public ResultList getNewsByNewsDate(SearchBase searchBase) {
+		System.err.println("searchBase.getEndDate() : "+searchBase.getEndDate());
+		TextMiningModel tmm = textMiningMapper.getMaxBeforeDate(searchBase);
+		if(tmm != null) {
+			SimpleDateFormat foramt = new SimpleDateFormat("yyyy-MM-dd");
+			searchBase.setStartDate(foramt.format(tmm.getNewsDate()));
+		}
+		ResultList resultList = new ResultList(searchBase);
+		resultList.setResultList(newsMapper.newsListByNewsDate(searchBase));
+		resultList.setTotalRecordCount(newsMapper.newsListByNewsDateCount(searchBase));
+		return resultList;
+	}
+
 }
