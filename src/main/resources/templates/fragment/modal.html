@@ -166,5 +166,97 @@
 		<!-- /.modal-dialog -->
 	</div>
 	<!--  -->
+	<!--  -->
+	<div id="mailCycle" th:fragment="mailCycle" class="modal fade"
+		role="dialog" aria-labelledby="gridSystemModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<!-- <button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="gridSystemModalLabel">메일발송</h4> -->
+					<h4 class="modal-title" >메일 주기 입력</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<input type="text" id="mailDatePicker" readonly="readonly" placeholder="Cycle date">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="setMailCycle()">Save</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!--  -->
+	<!--  -->
+	<div id="miningCycle" th:fragment="miningCycle" class="modal fade"
+		role="dialog" aria-labelledby="gridSystemModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">마이닝 주기 입력</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<div class="form-check">
+					      <label class="form-check-label" for="daily">
+					        <input type="radio" class="form-check-input" id="daily" name="optradio" value="D" checked>매일
+					      </label>
+					    </div>
+						<div class="form-check">
+					      <label class="form-check-label" for="weekly">
+					        <input type="radio" class="form-check-input" id="weekly" name="optradio" value="W" >매주
+					      </label>
+					    </div>
+					    <div id="checkWeek" style="display: none;">
+						    <div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="MON">MON
+							  </label>
+							</div>
+							<div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="TUE">TUE
+							  </label>
+							</div>
+							<div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="WED">WED
+							  </label>
+							</div>
+							<div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="THU">THU
+							  </label>
+							</div>
+							<div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="FRI">FRI
+							  </label>
+							</div>
+						</div>
+						<input type="text" id="miningDatePicker" readonly="readonly" placeholder="start date">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="setMiningCycle()">Save</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!--  -->
 </body>
 </html>

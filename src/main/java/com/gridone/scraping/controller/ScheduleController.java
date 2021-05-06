@@ -44,17 +44,20 @@ public class ScheduleController {
 	
 	@Scheduled(cron = "0 0/1 * 1/1 * ?")
 	public void scheduleSet() throws ParseException {
-//		System.err.println("#####scheduleSet######");
+		System.err.println("#####scheduleSet######");
 		
 		// 1. schedule list 중 nextTime이 현재 시간과 같은 애를 뽑는다.
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:00");
-		List<ScheduleModel> currSchedule = scheduleService.getCurrNextTime(sdf.format(new Date()));
+		Date currDate = new Date();
+		
+		List<ScheduleModel> currSchedule = scheduleService.getCurrNextTime(sdf.format(currDate));
 		
 		if(currSchedule == null || currSchedule.size() == 0) {
 			return;
 		}
 		
 		List<ScheduleModel> mails = currSchedule.stream().filter(a -> a.getType() == EnumScheduleType.MONITORING).collect(Collectors.toList());
+		List<ScheduleModel> minings = currSchedule.stream().filter(a -> a.getType() == EnumScheduleType.TEXTMINING).collect(Collectors.toList());
 		
 		// 2. schedule nextTime update
 		for (ScheduleModel s : currSchedule) {
@@ -63,51 +66,69 @@ public class ScheduleController {
 		}
 		
 		// 3. 1에서 type이 메일인 친구를 뽑아서 해당 서비스 호출
-		if(mails == null || mails.size() == 0) {
-			return;
+		if(mails != null || mails.size() > 0) {
+			mails.forEach(a -> newsMonitoringService.monitoringSendEmail(a.getUserId()));
 		}
-		System.out.println("mails : "+mails);
-		mails.forEach(a -> newsMonitoringService.monitoringSendEmail(a.getUserId()));
+		
+		if(minings != null || minings.size() > 0) {
+			minings.parallelStream().forEach(m -> {
+				TextMiningModel data = textMiningService.getMiningDataByUserId(m.getUserId());
+				ScrapAttribute param = new ScrapAttribute();
+				SimpleDateFormat paramFormat = new SimpleDateFormat("yyyy-MM-dd");
+				param.setUserId(m.getUserId());
+				param.setEndDate(paramFormat.format(currDate));
+				if(data == null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(new Date());
+					cal.add(Calendar.YEAR, -2); // 없을 경우 현재일 기준 2년 전 기준 startdate
+					param.setStartDate(sdf.format(cal.getTime()));
+				}else {
+					param.setStartDate(sdf.format(data.getNewsDate()));
+				}
+				newsService.textmining(param);
+			});
+			System.err.println("#####textmining end######");
+		}
+		
 	}
 	
-	@Scheduled(cron = "0 0 0 1/1 * ?")
-//	@RequestMapping(value = "/testtest")
-	public void textmining() {
-		System.err.println("#####textmining######");
-		// 일, 주단위, 시간은 매 자정만임,,
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-16 00:00:00");
-		Date currDate = new Date();
-		List<ScheduleModel> currSchedule = scheduleService.getCurrNextTime(sdf.format(currDate));
-		if(currSchedule == null || currSchedule.size() == 0) {
-			return;
-		}
-		
-		List<ScheduleModel> minings = currSchedule.stream().filter(a -> a.getType() == EnumScheduleType.TEXTMINING).collect(Collectors.toList());
-		System.out.println("minings : "+minings);
-		
-		if(minings == null || minings.size() == 0) {
-			return;
-		}
-		
-		minings.parallelStream().forEach(m -> {
-			TextMiningModel data = textMiningService.getMiningDataByUserId(m.getUserId());
-			ScrapAttribute param = new ScrapAttribute();
-			SimpleDateFormat paramFormat = new SimpleDateFormat("yyyy-MM-dd");
-			param.setUserId(m.getUserId());
-			param.setEndDate(paramFormat.format(currDate));
-			if(data == null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(new Date());
-				cal.add(Calendar.YEAR, -2); // 없을 경우 현재일 기준 2년 전 기준 startdate
-				param.setStartDate(sdf.format(cal.getTime()));
-			}else {
-				param.setStartDate(sdf.format(data.getNewsDate()));
-			}
-			newsService.textmining(param);
-		});
-		System.err.println("#####textmining end######");
-	}
+//	@Scheduled(cron = "0 0 0 1/1 * ?")
+////	@RequestMapping(value = "/testtest")
+//	public void textmining() {
+//		System.err.println("#####textmining######");
+//		// 일, 주단위, 시간은 매 자정만임,,
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+////		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-16 00:00:00");
+//		Date currDate = new Date();
+//		List<ScheduleModel> currSchedule = scheduleService.getCurrNextTime(sdf.format(currDate));
+//		if(currSchedule == null || currSchedule.size() == 0) {
+//			return;
+//		}
+//		
+//		List<ScheduleModel> minings = currSchedule.stream().filter(a -> a.getType() == EnumScheduleType.TEXTMINING).collect(Collectors.toList());
+//		
+//		if(minings == null || minings.size() == 0) {
+//			return;
+//		}
+//		
+//		minings.parallelStream().forEach(m -> {
+//			TextMiningModel data = textMiningService.getMiningDataByUserId(m.getUserId());
+//			ScrapAttribute param = new ScrapAttribute();
+//			SimpleDateFormat paramFormat = new SimpleDateFormat("yyyy-MM-dd");
+//			param.setUserId(m.getUserId());
+//			param.setEndDate(paramFormat.format(currDate));
+//			if(data == null) {
+//				Calendar cal = Calendar.getInstance();
+//				cal.setTime(new Date());
+//				cal.add(Calendar.YEAR, -2); // 없을 경우 현재일 기준 2년 전 기준 startdate
+//				param.setStartDate(sdf.format(cal.getTime()));
+//			}else {
+//				param.setStartDate(sdf.format(data.getNewsDate()));
+//			}
+//			newsService.textmining(param);
+//		});
+//		System.err.println("#####textmining end######");
+//	}
 	
 	
 }

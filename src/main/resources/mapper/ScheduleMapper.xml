@@ -47,4 +47,10 @@
   		WHERE NEXTTIME = #{date,jdbcType=VARCHAR}
   	</select>
   	
+  	<select id="getUserTypeSchedule" parameterType="com.gridone.scraping.model.ScheduleModel" resultMap="BaseResultMap">
+  		SELECT ID, USERID, TYPE, CRON, NEXTTIME
+  		FROM tb_schedule
+  		WHERE USERID = #{userId} AND TYPE = #{type,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+  	</select>
+  	
 </mapper>

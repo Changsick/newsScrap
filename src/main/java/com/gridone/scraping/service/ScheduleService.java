@@ -109,5 +109,9 @@ public class ScheduleService {
 	public void updateSchedule(ScheduleModel schedule) {
 		scheduleMapper.updateSchedule(schedule);
 	}
+	
+	public ScheduleModel getUserTypeSchedule(ScheduleModel schedule) {
+		return scheduleMapper.getUserTypeSchedule(schedule);
+	}
  
 }

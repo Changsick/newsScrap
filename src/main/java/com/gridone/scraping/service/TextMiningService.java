@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.gridone.scraping.mapper.TextMiningMapper;
+import com.gridone.scraping.model.LoginUserDetails;
+import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.TextMiningModel;
 
 @Service

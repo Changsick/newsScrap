@@ -1,24 +1,14 @@
 package com.gridone.scraping.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.gridone.scraping.component.WebScraping;
-import com.gridone.scraping.model.Keyword;
-import com.gridone.scraping.model.ResultList;
-import com.gridone.scraping.model.SearchBase;
 import com.gridone.scraping.service.KeywordService;
 import com.gridone.scraping.service.NewsService;
 
 @Controller
-@RequestMapping("/newsScrapingTest")
 public class TestController {
 
 	@Autowired
@@ -30,18 +20,63 @@ public class TestController {
 	@Autowired
 	NewsService newsService;
 	
-	@RequestMapping("/test")
-	public String test() {
-		/*List<Keyword> list = keywordService.selectAll();
-		System.err.println("list : "+list);
-		for (Keyword k : list) {
-			String keywords = k.getEnterprise() + " \"" + k.getKeywords().split(",")[0] + "\"" + " \"" + k.getKeywords().split(",")[1]+ "\"";
-//			System.err.println("keywords : "+keywords);
-		}
-		webScraping.shceduledItemList();*/
-//		webScraping.sendEmail();
-		return "dailyNews";
-	}
+	@Autowired
+//	DepartmentMapper departmentMapper;
+	
+//	@RequestMapping("/testtest1")
+//	public @ResponseBody Object test() {
+//		List<DepartmentModel> data = departmentMapper.getDepart();
+//		
+//		List<DepartTree> tree = new ArrayList<DepartTree>();
+//		
+//		
+//		Integer lastLevel = data.get(0).getLvl();
+//		for(int i = 0; i < data.size(); i++) {
+//			
+//			if(i == 0) { // last child
+//				DepartTree last = new DepartTree();
+//				last.setId(data.get(i).getId());
+//				last.setParentId(data.get(i).getParentId());
+//				last.setName(data.get(i).getName());
+//				last.setLvl(data.get(i).getLvl());
+//
+//				tree.add(last);
+//			}else {
+//				DepartTree last = new DepartTree();
+//				last.setId(data.get(i).getId());
+//				last.setParentId(data.get(i).getParentId());
+//				last.setName(data.get(i).getName());
+//				last.setLvl(data.get(i).getLvl());
+//
+//				List<DepartTree> removeTarget = new ArrayList<>();
+//				
+//				for (DepartTree t : tree) {
+//					System.out.println("t : "+t);
+//					if(data.get(i).getId() == t.getParentId()) {
+//						if(t.getNodes().size() == 0) {							
+//							t.setNodes(null);
+//						}
+//						last.addNodes(t);
+//						removeTarget.add(t);
+//					}
+//					
+//				}
+//				tree.add(last);
+//				
+//				for (DepartTree r : removeTarget) {
+//					tree.remove(r);
+//				}
+//				
+//				
+//				
+//			}
+//			
+//		}
+//		
+//		System.out.println("tree : "+tree);
+//		
+//		return tree;
+//	}
 	
 	@RequestMapping("/test2")
 	public String test2() {

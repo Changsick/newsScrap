@@ -18,4 +18,6 @@ public interface ScheduleMapper {
 
 	List<ScheduleModel> getCurrNextTime(String date);
 
+	ScheduleModel getUserTypeSchedule(ScheduleModel schedule);
+
 }
