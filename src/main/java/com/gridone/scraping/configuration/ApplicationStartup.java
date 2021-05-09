@@ -51,7 +51,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 				textminingSchedule.setCron(DEFAULTCRON);
 				textminingSchedule.setUserId(u.getId());
 				textminingSchedule.setType(EnumScheduleType.TEXTMINING);
-				textminingSchedule.setNextTime(scheduleService.checkNextTime(DEFAULTCRON));
+				textminingSchedule.setNextTime(scheduleService.checkNextTime(MININGCRON));
 				scheduleService.insertTextminingSchedule (textminingSchedule);
 			}
 			

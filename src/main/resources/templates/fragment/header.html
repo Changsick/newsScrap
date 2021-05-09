@@ -35,12 +35,12 @@
 				<ul class="navbar-nav me-auto" sec:authorize="isAuthenticated()">  <!-- sec:authorize="isAuthenticated()" -->
 					<li class="nav-item"><a class="nav-link" th:href="@{|/monitoringNews|}" th:if="${#authorization.expression('isAdmin()')}">스케줄 뉴스 스크랩<span class="square"><sup><i class="fas fa-square-full"></i></sup></span></a></li>
 					<li class="nav-item"><a class="nav-link" th:href="@{|/dailyNews|}">즉시 뉴스 스크랩<span class="square"><sup><i class="fas fa-square-full"></i></sup></span></a></li>
-					<li class="nav-item"><a class="nav-link" th:href="@{|/textmining|}">텍스트 데이터 마이닝<span class="square"><sup><i class="fas fa-square-full"></i></sup></span></a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{|/textmining|}">뉴스 분석<span class="square"><sup><i class="fas fa-square-full"></i></sup></span></a></li>
 				</ul>
 				<div style="float: right;">
 					<form class="information" style="display: flex!important" sec:authorize="isAuthenticated()">
 						<span class="info-set">
-							<img src="./images/person.png" alt="프로필 사진" width="30px">
+							<a th:href="@{|/myPage|}"><img src="./images/person.png" alt="프로필 사진" width="30px"></a>
 			        		<span class="info"><label id="name" sec:authentication="name">이승민</label>님</span>
 						</span>
 			        	<a class="login" th:href="@{|/logout|}">로그아웃</a>

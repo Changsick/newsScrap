@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,24 +34,44 @@ public class TextMiningController {
 	@Autowired
 	ScheduleService scheduleService;
 	
-	@RequestMapping(value = "/getMiningTime", method = RequestMethod.POST)
-	public @ResponseBody Map<String, Object> getMiningTime(){
+	@RequestMapping(value = "/getScheduleTime", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> getMiningTime(ScheduleModel param){
 		Map<String, Object> retVal = new HashMap<String, Object>();
 		boolean result = false;
 		try {
-			ScheduleModel sm = new ScheduleModel();
+//			ScheduleModel sm = new ScheduleModel();
 			LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			sm.setUserId(user.getId());
-			sm.setType(EnumScheduleType.TEXTMINING);
+			param.setUserId(user.getId());
+//			sm.setType(EnumScheduleType.TEXTMINING);
 			
-			ScheduleModel getSchedule = scheduleService.getUserTypeSchedule(sm);
+			ScheduleModel getSchedule = scheduleService.getUserTypeSchedule(param);
 			retVal.put("data", getSchedule);
 			
 			final Cron cron = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ)).parse(getSchedule.getCron());
 			
-			System.err.println("cron.asString() : "+cron.asString());
-			System.err.println("cron.getCronDefinition() : "+cron.getCronDefinition().isMatchDayOfWeekAndDayOfMonth());
-			System.err.println("cron.validate() : "+cron.validate());
+//			System.err.println("cron.asString() : "+cron.asString());
+//			System.err.println("cron.getCronDefinition() : "+cron.getCronDefinition().isMatchDayOfWeekAndDayOfMonth());
+//			System.err.println("cron.validate() : "+cron.validate());
+			result = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		retVal.put("result", result);
+		return retVal;
+	}
+	
+	@RequestMapping(value = "/editScheduleTime", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> editScheduleTime(ScheduleModel param){
+		Map<String, Object> retVal = new HashMap<String, Object>();
+		boolean result = false;
+		try {
+			LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			param.setUserId(user.getId());
+			ScheduleModel userSchedule = scheduleService.getUserTypeSchedule(param);
+			userSchedule.setCron(param.getCron());
+			userSchedule.setNextTime(scheduleService.checkNextTime(param.getCron()));
+			System.err.println("update userSchedule --> "+userSchedule);
+			scheduleService.updateSchedule(userSchedule);
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();

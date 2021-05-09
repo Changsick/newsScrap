@@ -21,6 +21,12 @@
 		WHERE EMAIL = #{email,jdbcType=VARCHAR}
   	</select>
   	
+  	<select id="selectUserById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  		SELECT ID, EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, REGISTER_DATE, PASSWORD_CHANGE
+		FROM tb_user
+		WHERE ID = #{id}
+  	</select>
+  	
   	<insert id="insertUser" parameterType="com.gridone.scraping.model.UserModel">
   		<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       		SELECT LAST_INSERT_ID()
@@ -43,4 +49,28 @@
 		FROM tb_user
 		WHERE ROLE = 1
   	</select>
+  	
+  	<update id="updateUser" parameterType="com.gridone.scraping.model.UserModel">
+  		UPDATE tb_user
+  		SET PASSWORD = #{password},
+  		NAME = #{name},
+  		PHONE = #{phone},
+  		ACTIVE = #{active,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},
+  		ROLE = #{role,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+  		WHERE ID = #{id}
+  	</update>
+  	
+  	<select id="getUsersInfo" parameterType="com.gridone.scraping.model.SearchBase" resultMap="BaseResultMap">
+  		SELECT ID, EMAIL, PASSWORD, NAME, PHONE, ACTIVE, ROLE, PASSWORD_FAIL_COUNT, REGISTER_DATE, PASSWORD_CHANGE
+		FROM tb_user
+		WHERE ID != #{userId}
+		LIMIT #{firstIndex} , #{recordCountPerPage}
+  	</select>
+  	
+  	<select id="getUsersInfoCount" parameterType="com.gridone.scraping.model.SearchBase" resultType="Integer">
+		SELECT count(*)
+		FROM tb_user
+		WHERE ID != #{userId}
+  	</select>
+  	
 </mapper>

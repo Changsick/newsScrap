@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,9 +14,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.gridone.scraping.mapper.NewsMonitoringMapper;
 import com.gridone.scraping.mapper.UserMapper;
+import com.gridone.scraping.model.Keyword;
 import com.gridone.scraping.model.LoginUserDetails;
+import com.gridone.scraping.model.ResultList;
 import com.gridone.scraping.model.ScheduleModel;
+import com.gridone.scraping.model.SearchBase;
 import com.gridone.scraping.model.UserModel;
 import com.gridone.scraping.type.EnumActive;
 import com.gridone.scraping.type.EnumScheduleType;
@@ -32,6 +37,12 @@ public class UserService implements UserDetailsService {
 	
 	@Autowired
 	ScheduleService scheduleService;
+	
+	@Autowired
+	KeywordService keywordService;
+	
+	@Autowired
+	NewsMonitoringMapper newsMonitoringMapper;
 	
 	private static String DEFAULTCRON = "0 0 9 ? * FRI *";
 	private static String MININGCRON = "0 0 0 ? * FRI *";
@@ -79,11 +90,103 @@ public class UserService implements UserDetailsService {
 		return userMapper.selectByLogin(email);
 	}
 	
+	public UserModel selectUserById(Integer id) {
+		return userMapper.selectUserById(id);
+	}
+	
 	public List<UserModel> getAllAdmins() {
 		return userMapper.getAllAdmins();
 	}
 
 	public List<UserModel> getUsers() {
 		return userMapper.getUsers();
+	}
+
+	public Map<String, Object> myInfo() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		int state_ok = -1;
+		try {
+			LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			result.put("data", selectUser(user.getEmail()));
+			state_ok = 200;
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("msg", e.getMessage());
+		}
+		result.put("state_ok", state_ok);
+		return result;
+	}
+
+	public Map<String, Object> saveMyInfo(UserModel um) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		int state_ok = -1;
+		try {
+			UserModel user = selectUser(um.getEmail());
+			user.setName(um.getName());
+			user.setPhone(um.getPhone());
+			
+			userMapper.updateUser(user);
+			state_ok = 200;
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("msg", e.getMessage());
+		}
+		result.put("state_ok", state_ok);
+		return result;
+	}
+
+	public Map<String, Object> getUsersInfo(SearchBase search) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		int state_ok = -1;
+		try {
+			LoginUserDetails user = (LoginUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			search.setUserId(user.getId());
+			ResultList resultList = new ResultList(search);
+			resultList.setResultList(userMapper.getUsersInfo(search));
+			resultList.setTotalRecordCount(userMapper.getUsersInfoCount(search));
+			result.put("data", resultList);
+			state_ok = 200;
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("msg", e.getMessage());
+		}
+		result.put("state_ok", state_ok);
+		return result;
+	}
+
+	public Map<String, Object> editUser(UserModel um) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		int state_ok = -1;
+		try {
+			UserModel user = selectUser(um.getEmail());
+			
+			ScheduleModel adminSchedule = new ScheduleModel(); // only admin
+			adminSchedule.setUserId(user.getId());
+			adminSchedule.setType(EnumScheduleType.MONITORING);
+			if(um.getRole().equals(EnumUserRole.ADMIN)) {
+				ScheduleModel userSchedule = scheduleService.getUserTypeSchedule(adminSchedule);
+				if(userSchedule == null) {
+					adminSchedule.setCron(MININGCRON);
+					adminSchedule.setNextTime(scheduleService.checkNextTime(MININGCRON)); //scheduleService.checkNextTime(DEFAULTCRON)
+					scheduleService.insertMailSchedule(adminSchedule);					
+				}
+			}else {
+				scheduleService.deleteMailScheduleUser(adminSchedule);
+				List<Keyword> keyList = keywordService.selectByLogin(user.getId());
+				for (Keyword k : keyList) {
+					newsMonitoringMapper.deleteByKeywordId(k);
+				}
+			}
+			
+			user.setActive(um.getActive());
+			user.setRole(um.getRole());
+			userMapper.updateUser(user);
+			state_ok = 200;
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("msg", e.getMessage());
+		}
+		result.put("state_ok", state_ok);
+		return result;
 	}
 }

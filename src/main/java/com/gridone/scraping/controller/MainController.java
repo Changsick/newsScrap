@@ -33,4 +33,9 @@ public class MainController {
 	public String textminingPage() {
 		return "textmining";
 	}
+	
+	@GetMapping("/myPage")
+	public String myPage() {
+		return "myPage";
+	}
 }

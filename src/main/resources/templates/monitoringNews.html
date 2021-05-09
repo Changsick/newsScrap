@@ -4,8 +4,12 @@
 <link rel="stylesheet" href="./css/bootstrap.css">
 	<script src="https://kit.fontawesome.com/e9c6f54b2b.js" crossorigin="anonymous"></script>
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script> -->
-	<script type="text/javascript" src="./js/matchMedia.js"></script>
-	<script type="text/javascript" src="./js/matchMedia.addListener.js"></script>
+	<!-- <script type="text/javascript" src="./js/matchMedia.js"></script>
+	<script type="text/javascript" src="./js/matchMedia.addListener.js"></script> -->
+	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.timepicker.min.css}"/>
+	<script th:src="@{/js/jquery.timepicker.min.js}"></script>
+	
 <!-- <li role="presentation" id="{{id}}" onclick="getNews(event, {{id}})" ><a id="text_{{id}}" style="display:inline-block;" onclick='activeCss(event, {{id}})'>{{enterprise}}</a></li> -->
 	<script id="list-template" type="text/x-handlebars-template">
 	{{#resultList}}
@@ -32,38 +36,38 @@
    {{#pagination paging.currentPageNo paging.totalPageCount paging.pageSize }}
       {{#checkPage lastPage}}      
          {{#if startFromFirstPage}}
-			<li><a href="#" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
          {{else}}
-			<li><a href="#" onclick="newsList({{firstPage}});return false;" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" onclick="newsList({{firstPage}});return false;" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
          {{/if}}
    
          {{#if prevShow}}
-			 <li><a href="#" onclick="newsList({{prevPage}});return false;" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+			 <li class="page-item"><a class="page-link" href="#" onclick="newsList({{prevPage}});return false;" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
          {{else}}
-			<li><a href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
          {{/if}}
           {{else}}         
       {{/checkPage}}
          {{#each pages}}
             {{#if isCurrent}}
-				<li class="active"><a>{{page}}</a></li>
+				<li class="page-item active"><a class="page-link">{{page}}</a></li>
             {{/if}}
             {{#unless isCurrent}} 
 
-				<li><a href="#" onclick="newsList({{page}});return false;">{{page}}</a></li>  
+				<li class="page-item"><a class="page-link" href="#" onclick="newsList({{page}});return false;">{{page}}</a></li>  
             {{/unless}}
          {{/each}}
       {{#checkPage lastPage}}
          {{#if nextShow}}
-			<li><a href="#" onclick="newsList({{nextPage}});return false;" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" onclick="newsList({{nextPage}});return false;" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
          {{else}}
-			<li><a href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
          {{/if}}
 
          {{#if endAtLastPage}}
-				<li><a href="#" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
          {{else}}
-				<li><a href="#" onclick="newsList({{lastPage}});return false;" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+				<li class="page-item"><a class="page-link" href="#" onclick="newsList({{lastPage}});return false;" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
          {{/if}}
          {{else}}         
       {{/checkPage}}
@@ -405,6 +409,98 @@
 			// 
 		}
 		
+		function initMiningPops(){
+			$("#daily").prop("checked",true);
+			$("#checkWeek").css("display","none");
+			$(".weekDay").prop("checked",false);
+		}
+		
+		function sendMailTimeSet(e){
+			var url = [[@{|/getScheduleTime|}]];
+			var result = $.post(url, {type : "MONITORING"});
+			result.done(function(res) {
+				if(res.data){
+					var weekData = res.data.cron.split(" ")[5];
+					var hourData = res.data.cron.split(" ")[2];
+					var minuteData = res.data.cron.split(" ")[1];
+					minuteData = minuteData.split("/").length > 1 ? minuteData.split("/")[1] : minuteData;
+					$("#miningDatePicker").timepicker({
+						timeFormat: 'HH:mm',
+					    interval: 30,
+					    defaultTime: hourData+":"+minuteData,
+					});
+					if(weekData.length > 1){
+						$("#weekly").prop("checked",true);
+						$("#checkWeek").css("display","block");
+						weekData.split(",").forEach(function(e,i){
+							$(".weekDay").each(function(i2, e2){
+								if($(e2).val() == e){
+									$(e2).prop("checked",true);
+								}
+							});
+						});
+					}
+					
+				}else{
+					alert(res.msg);
+				}
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+				$("#miningCycle").modal("hide");
+		    });
+			
+			$("#miningCycle").modal("show");
+			
+		}
+		
+		function setMiningCycle(){
+			var time = $("#miningDatePicker").val();
+			var hour = time.split(":")[0];
+			var minute = time.split(":")[1];
+			
+			var cronEx = "0 " + Number(minute) + " " + Number(hour) + " ";
+			if($("input[name='optradio']:checked").val() == "D"){
+				cronEx += "* * ? *";
+			}else if($("input[name='optradio']:checked").val() == "W"){
+				cronEx += "? * WEEKS *";
+				if($('.weekDay:checked').length == 0){
+					alert("주기 요일을 선택하세요");
+					return false;
+				}
+// 				console.log('length',$('.weekDay:checked').length);
+				var weekdays = "";
+				$('.weekDay').each(function(i, e) {
+					if($(e).prop("checked")){
+						weekdays += $(e).val() + ",";						
+					}
+				});
+				cronEx = cronEx.replace("WEEKS",weekdays.substring(0,weekdays.length-1));
+			}
+			console.log('cronEx',cronEx);
+			
+			var url = [[@{|/editScheduleTime|}]];
+			var data = {
+					cron : cronEx,
+					type : "MONITORING"
+			}
+			var result = $.post(url, data);
+			result.done(function(res) {
+				if(res.result){
+					alert("변경되었습니다.");
+				}else{
+					alert("fail\n"+res.msg);
+				}
+		    });
+			result.fail(function(xhr, status, error) {
+				console.log("code:"+xhr.status+"\n"+"message:"+xhr.responseText+"\n"+"state:"+status+"\n"+"error:"+error);
+				alert("fail");
+		    });
+			
+			$("#miningCycle").modal("hide");
+		}
+		
 		var timerId = null;
 		$(function(){
 			
@@ -560,6 +656,13 @@
 				}
 			});
 			
+			$("#daily").click(function(){
+				$("#checkWeek").css("display","none");
+			});
+			$("#weekly").click(function(){
+				$("#checkWeek").css("display","block");
+			});
+			
 		})
 		/*]]>*/
 	</script>
@@ -703,6 +806,10 @@
 	.ui-datepicker .ui-widget .ui-widget-content .ui-helper-clearfix .ui-corner-all{
 		z-index: 9999;
 	}
+	
+	.ui-timepicker-container{ 
+	     z-index:9999 !important; 
+	}
 </style>
 </head>
 <body>
@@ -842,7 +949,7 @@
 					<input type="hidden" id="pageNo" name="pageNo"/>
 					<div id="newsPage" align="center"> 
 						<nav>
-						  <ul class="pagination">
+						  <ul class="pagination justify-content-sm-center">
 						    
 						  </ul>
 						</nav>
@@ -906,7 +1013,7 @@
 	</div>
 	<div th:replace="fragment/modal :: addEnterprise"></div>
 	<div th:replace="fragment/modal :: modifySetting"></div>
-<!-- 	<div th:replace="fragment/modal :: sendMailUser"></div> -->
+	<div th:replace="fragment/modal :: miningCycle"></div>
 	<div th:replace="fragment/modal :: scrapNewsByDate"></div>
 	<div id="footer" th:include="fragment/footer :: footer"></div>
 	<script type="text/javascript" src="./js/bootstrap.js"></script>

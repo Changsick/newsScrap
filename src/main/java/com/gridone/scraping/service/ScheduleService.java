@@ -113,5 +113,9 @@ public class ScheduleService {
 	public ScheduleModel getUserTypeSchedule(ScheduleModel schedule) {
 		return scheduleMapper.getUserTypeSchedule(schedule);
 	}
+
+	public void deleteMailScheduleUser(ScheduleModel adminSchedule) {
+		scheduleMapper.deleteMailScheduleUser(adminSchedule);
+	}
  
 }

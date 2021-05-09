@@ -244,8 +244,24 @@
 							    <input type="checkbox" class="form-check-input weekDay" value="FRI">FRI
 							  </label>
 							</div>
+							<div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="SAT">SAT
+							  </label>
+							</div>
+							<div class="form-check-inline">
+							  <label class="form-check-label">
+							    <input type="checkbox" class="form-check-input weekDay" value="SUN">SUN
+							  </label>
+							</div>
 						</div>
-						<input type="text" id="miningDatePicker" readonly="readonly" placeholder="start date">
+						<div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text" id="basic-addon1">주기 시간</span>
+						  </div>
+						  <!-- <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"> -->
+							<input type="text" id="miningDatePicker" readonly="readonly" placeholder="start date">
+						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -258,5 +274,51 @@
 		<!-- /.modal-dialog -->
 	</div>
 	<!--  -->
+	
+	<!--  -->
+	<div id="setUser" th:fragment="setUser" class="modal fade"
+		role="dialog" aria-labelledby="gridSystemModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" >사용자 정보</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<div class="input-group mb-3">
+						  <span class="input-group-text" >아이디</span>
+						  <input type="text" class="form-control" aria-describedby="editEmail" readonly="readonly" id="editEmail">
+						</div>
+					  	<div class="input-group mb-3">
+						  <span class="input-group-text" >이름</span>
+						  <input type="text" class="form-control" aria-describedby="editName" id="editName" readonly="readonly">
+						</div>
+					  	<div class="input-group mb-3">
+						  <span class="input-group-text" >휴대폰</span>
+						  <input type="text" class="form-control" aria-describedby="editPhone" id="editPhone" readonly="readonly">
+						</div>
+					  	<div class="input-group mb-3">
+						  <span class="input-group-text" >상태</span>
+						  <select class="form-control" aria-describedby="editActive" id="editActive"></select>
+						</div>
+					  	<div class="input-group mb-3">
+						  <span class="input-group-text" >권한</span>
+						  <select class="form-control" aria-describedby="editRole" id="editRole"></select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="saveEditUser()">Save</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!--  -->
+	
 </body>
 </html>

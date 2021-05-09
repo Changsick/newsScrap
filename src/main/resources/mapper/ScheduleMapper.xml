@@ -37,7 +37,7 @@
   	<update id="updateSchedule" parameterType="com.gridone.scraping.model.ScheduleModel">
   		UPDATE tb_schedule
   		SET CRON = #{cron},
-  		NEXTTIME = #{nextTime}
+	  	NEXTTIME = #{nextTime}
   		WHERE ID = #{id}
   	</update>
   	
@@ -52,5 +52,10 @@
   		FROM tb_schedule
   		WHERE USERID = #{userId} AND TYPE = #{type,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
   	</select>
+  	
+  	<delete id="deleteMailScheduleUser" parameterType="com.gridone.scraping.model.ScheduleModel">
+  		DELETE FROM tb_schedule
+  		WHERE USERID = #{userId} AND TYPE = #{type,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+  	</delete>
   	
 </mapper>

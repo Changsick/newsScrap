@@ -20,4 +20,6 @@ public interface ScheduleMapper {
 
 	ScheduleModel getUserTypeSchedule(ScheduleModel schedule);
 
+	void deleteMailScheduleUser(ScheduleModel adminSchedule);
+
 }

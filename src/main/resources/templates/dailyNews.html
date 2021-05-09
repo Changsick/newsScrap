@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="./css/bootstrap.css">
 	<script src="https://kit.fontawesome.com/e9c6f54b2b.js" crossorigin="anonymous"></script>
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script> -->
-	<script type="text/javascript" src="./js/matchMedia.js"></script>
-	<script type="text/javascript" src="./js/matchMedia.addListener.js"></script>
+	<!-- <script type="text/javascript" src="./js/matchMedia.js"></script>
+	<script type="text/javascript" src="./js/matchMedia.addListener.js"></script> -->
 <!-- <li role="presentation" id="{{id}}" onclick="getNews(event, {{id}})" ><a id="text_{{id}}" style="display:inline-block;" onclick='activeCss(event, {{id}})'>{{enterprise}}</a></li> -->
 	<script id="list-template" type="text/x-handlebars-template">
 	{{#resultList}}
@@ -32,38 +32,38 @@
    {{#pagination paging.currentPageNo paging.totalPageCount paging.pageSize }}
       {{#checkPage lastPage}}      
          {{#if startFromFirstPage}}
-			<li><a href="#" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
          {{else}}
-			<li><a href="#" onclick="newsList({{firstPage}});return false;" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" onclick="newsList({{firstPage}});return false;" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
          {{/if}}
    
          {{#if prevShow}}
-			 <li><a href="#" onclick="newsList({{prevPage}});return false;" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+			 <li class="page-item"><a class="page-link" href="#" onclick="newsList({{prevPage}});return false;" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
          {{else}}
-			<li><a href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
          {{/if}}
           {{else}}         
       {{/checkPage}}
          {{#each pages}}
             {{#if isCurrent}}
-				<li class="active"><a>{{page}}</a></li>
+				<li class="page-item active"><a class="page-link">{{page}}</a></li>
             {{/if}}
             {{#unless isCurrent}} 
 
-				<li><a href="#" onclick="newsList({{page}});return false;">{{page}}</a></li>  
+				<li class="page-item"><a class="page-link" href="#" onclick="newsList({{page}});return false;">{{page}}</a></li>  
             {{/unless}}
          {{/each}}
       {{#checkPage lastPage}}
          {{#if nextShow}}
-			<li><a href="#" onclick="newsList({{nextPage}});return false;" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" onclick="newsList({{nextPage}});return false;" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
          {{else}}
-			<li><a href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+			<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
          {{/if}}
 
          {{#if endAtLastPage}}
-				<li><a href="#" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
          {{else}}
-				<li><a href="#" onclick="newsList({{lastPage}});return false;" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+				<li class="page-item"><a class="page-link" href="#" onclick="newsList({{lastPage}});return false;" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
          {{/if}}
          {{else}}         
       {{/checkPage}}
@@ -880,7 +880,7 @@
 					<input type="hidden" id="pageNo" name="pageNo"/>
 					<div id="newsPage" align="center"> 
 						<nav>
-						  <ul class="pagination">
+						  <ul class="pagination justify-content-sm-center">
 						    
 						  </ul>
 						</nav>

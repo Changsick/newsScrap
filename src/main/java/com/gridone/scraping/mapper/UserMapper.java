@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.gridone.scraping.model.SearchBase;
 import com.gridone.scraping.model.UserModel;
 
 
@@ -17,6 +18,14 @@ public interface UserMapper {
 	List<UserModel> getAllAdmins();
 
 	List<UserModel> getUsers();
+
+	void updateUser(UserModel user);
+
+	List<UserModel> getUsersInfo(SearchBase search);
+
+	Integer getUsersInfoCount(SearchBase search);
+
+	UserModel selectUserById(Integer id);
 
 
 }

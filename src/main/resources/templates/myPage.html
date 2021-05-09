@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="fragment/includes :: heads"></div>
+<link rel="stylesheet" href="./css/bootstrap.css">
+	<script src="https://kit.fontawesome.com/e9c6f54b2b.js" crossorigin="anonymous"></script>
+	
+	<script id="userList-template" type="text/x-handlebars-template">
+	{{#resultList}}
+		<tr>
+			<th scope="row">{{math @index "+" 1}}</th>
+			<td><a href="#" onclick="setUser({{id}})">{{name}}</a></td>
+			<td>{{email}}</td>
+			<td>{{phone}}</td>
+			<td>{{active}}</td>
+			<td>{{role}}</td>
+		</tr>
+		{{else}}<td colspan="5" align="center">데이터가 없습니다.</td>
+	{{/resultList}}
+	</script>
+	
+	<script id="paging-template" type="text/x-handlebars-template">
+   {{rootVar "context" "[[@{/}]]"}}
+   {{#pagination paging.currentPageNo paging.totalPageCount paging.pageSize }}
+      {{#checkPage lastPage}}      
+         {{#if startFromFirstPage}}
+			<li class="page-item"><a class="page-link" href="#" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+         {{else}}
+			<li class="page-item"><a class="page-link" href="#" onclick="getUserList({{firstPage}});return false;" aria-label="PreviousStart"><span aria-hidden="true">&laquo;</span></a></li>
+         {{/if}}
+   
+         {{#if prevShow}}
+			 <li class="page-item"><a class="page-link" href="#" onclick="getUserList({{prevPage}});return false;" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+         {{else}}
+			<li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>
+         {{/if}}
+          {{else}}         
+      {{/checkPage}}
+         {{#each pages}}
+            {{#if isCurrent}}
+				<li class="page-item active"><a class="page-link">{{page}}</a></li>
+            {{/if}}
+            {{#unless isCurrent}} 
+
+				<li class="page-item"><a class="page-link" href="#" onclick="getUserList({{page}});return false;">{{page}}</a></li>  
+            {{/unless}}
+         {{/each}}
+      {{#checkPage lastPage}}
+         {{#if nextShow}}
+			<li class="page-item"><a class="page-link" href="#" onclick="getUserList({{nextPage}});return false;" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+         {{else}}
+			<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>
+         {{/if}}
+
+         {{#if endAtLastPage}}
+				<li class="page-item"><a class="page-link" href="#" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+         {{else}}
+				<li class="page-item"><a class="page-link" href="#" onclick="getUserList({{lastPage}});return false;" aria-label="NextEnd"><span aria-hidden="true">&raquo;</span></a></li>
+         {{/if}}
+         {{else}}         
+      {{/checkPage}}
+   {{/pagination}}
+	</script>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var enterpriseListUrl = [[@{|/enterpriseList.json|}]];
+		
+		function myInfo(){
+// 			var data = $("form#modifyForm").serializeObject();
+			var url = [[@{|/myInfo|}]];
+			var result = $.post(url);
+			result.then(function(res) {
+				if(res.state_ok == 200){
+					
+					$("#userEmail").val(res.data.email);
+					$("#userName").val(res.data.name);
+					$("#userPhone").val(res.data.phone);
+					$("#userRole").val(res.data.role);
+				}else{
+					alert("정보조회 실패\n"+res.msg);
+				}
+		    });
+		}
+		
+		function saveMyInfo(){
+			var phoneFormat = /^[0-9]{9,20}$/;
+			var nameFormat = /^\s*(?:\S\s*){1,30}$/;
+			
+			var userName = $("#userName").val();
+			var userPhone = $("#userPhone").val();
+			if(confirm("저장하시겠습니까?")){
+				if(userName.length == 0){
+					alert("이름을 입력해주세요.");
+					$("#userName").focus();
+					return false;
+				}
+				
+				if(!phoneFormat.test(userPhone)){
+					alert("휴대폰 번호는 9~20자리까지 숫자만 입력 가능합니다.");						
+					$("#userPhone").focus();
+					return false;
+				}
+				if(!nameFormat.test(userName)){
+					alert("이름은 1 ~ 30자까지 입력 가능합니다.");
+					$("#userName").focus();
+					return false;
+				}
+				
+				var data = {
+						email : $("#userEmail").val(),
+						name : $("#userName").val(),
+						phone : $("#userPhone").val()
+				};
+				var url = [[@{|/saveMyInfo|}]];
+				var result = $.post(url, data);
+				result.then(function(res) {
+					if(res.state_ok == 200){
+						alert("저장되었습니다.");
+						myInfo();
+					}else{
+						alert("정보저장 실패\n"+res.msg);
+					}
+			    });
+			}
+		}
+		
+		var currPage;
+		function getUserList(page){
+			currPage = page;
+			var data = {
+					pageNo : page,
+				};
+			var url = [[@{|/getUsersInfo|}]];
+			var result = $.post(url, data);
+			result.then(function(res) {
+				if(res.state_ok == 200){
+					var source = $("#userList-template").html();
+					var template = Handlebars.compile(source);
+					var itemList = template(res.data);
+					$('#userList').html(itemList);
+					
+					var page_source = $("#paging-template").html();
+					var page_template = Handlebars.compile(page_source);
+					var page_itemList = page_template(res.data);
+					$('.pagination').html(page_itemList);
+					$("#pageNo").val(res.data.paging.currentPageNo);
+				}else{
+					alert("정보조회 실패\n"+res.msg);
+				}
+		    });
+		}
+		
+		function userManagement(){
+			getUserList(1);
+		}
+		
+		function setUser(id){
+			var url = [[@{|/getUser|}]];
+			var result = $.post(url, {id:id});
+			result.then(function(res) {
+				if(res.state_ok == 200){
+					$("#editEmail").val(res.data.user.email);
+					$("#editName").val(res.data.user.name);
+					$("#editPhone").val(res.data.user.phone);
+					var activeTxt = "";
+					res.data.activeList.forEach(function(e,i){
+						if(res.data.user.active == e){
+							activeTxt += "<option value='"+e+"' selected='selected'>"+e+"</option>";
+						}else{						
+							activeTxt += "<option value='"+e+"'>"+e+"</option>";
+						}
+					});
+					$("#editActive").html(activeTxt);
+					var roleTxt = "";
+					res.data.roleList.forEach(function(e,i){
+						if(res.data.user.role == e){
+							roleTxt += "<option value='"+e+"' selected='selected'>"+e+"</option>";
+						}else{						
+							roleTxt += "<option value='"+e+"'>"+e+"</option>";
+						}
+					});
+					$("#editRole").html(roleTxt);
+					$("#setUser").modal("show");
+				}else{
+					alert(res.msg);
+				}
+			});
+		}
+		
+		function saveEditUser(){
+			
+			if(confirm("저장하시겠습니까?")){
+				var data = {
+						email : $("#editEmail").val(),
+						active : $("#editActive").val(),
+						role : $("#editRole").val()
+				};
+				var url = [[@{|/editUser|}]];
+				var result = $.post(url, data);
+				result.then(function(res) {
+					if(res.state_ok == 200){
+						alert("저장되었습니다.");
+						getUserList(currPage);
+					}else{
+						alert("정보저장 실패\n"+res.msg);
+					}
+			    });
+			}
+			
+			$("#setUser").modal("hide");
+		}
+		
+		$(function(){
+			$("#userInfo-tab").click();
+		})
+		/*]]>*/
+	</script>
+<style>
+	@media screen and (max-width: 2560px){
+		#mainForm {min-height: 910px;}
+		.data_mobile {display: none;}
+	}
+	
+	@media screen and (max-width: 1920px){
+		#mainForm {min-height: 680px;}
+		.data_mobile {display: none;}
+	}
+	
+	@media screen and (max-width: 768px){
+		.col-md-7>.row {padding-left: 12px; margin-top: 10px;}
+		.data_pc {display: none;}
+		.data_mobile {display: inline-block!important; padding-right: 12px;}
+	}
+	
+	@font-face {
+	    font-family: 'NanumSquareRound';
+	    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+	
+	*{
+		font-family: 'NanumSquareRound';
+	}
+	
+	.before-time, .after-time{
+		padding: 7px 10px;
+		font-weight: bold;
+	}
+	
+	.before-time>.buttons>button, .after-time>.buttons>button{
+		border: none;
+		background: none;
+		padding: 5px;
+	}
+	
+	/* .search-box{
+		border-top: none;
+	} */
+	
+	.search-box>input{
+	    width: -webkit-fill-available;
+	    border: none;
+	    padding: 3px;
+	    margin-left: 12px;
+	}
+	
+	.search-box>input:focus{
+		outline: none;
+	}
+	
+	.search-button{
+		width: 34px;
+		height: 34px;
+		margin-left: 5px;
+		margin-right: 6px;
+		border: none;
+		background: none;
+	}
+	
+	.funcbtn>button{
+		width: -webkit-fill-available;
+		height: 52px;
+		border: 2px solid #808080;
+		background: #F2DE67;
+		font-weight: bold;
+	}
+	
+	#enterpriseList{
+		padding: 0;
+	}
+	
+	#enterpriseList>li{
+		height: 69px;
+		list-style:none;
+	}
+	
+	#enterpriseList>li:hover{
+		background: #F2DE67;
+	}
+	
+	#enterpriseList>li>a{
+		color: #808080;
+		text-decoration: none;
+		line-height: 69px;
+	}
+	
+	.listButton{
+		position: relative;
+		left: 20%
+	}
+	
+	.listButton>button{
+		border: none;
+		background: rgba(0,0,0,.25);
+		color: white;
+		font-weight: bold;
+		border-radius: 20%;
+		
+	}
+	
+	.goTop {
+		display: block; 
+		position: fixed; 
+		bottom: 35px; /* 탑버튼을 화면의 가장 아래에서 몇 픽셀 떨어뜨릴 것인지 정하세요*/ 
+		right: 30px; /* 탑버튼을 화면의 가장 오른쪽에서 몇 픽셀 떨어뜨릴 것인지 정하세요*/ 
+		z-index: 999;
+		border: none;
+	    width: 30px;
+	    height: 30px;
+	    text-align: center;
+	    line-height: 30px;
+	    color: #ffffff;
+	    border-radius: 50%;
+	    background-color: #f2de67;
+	}
+	
+	.goTop:hover {
+		color: white;
+	}
+	
+	*::-webkit-scrollbar {
+		background-color: #FFFFFF;
+	}
+	
+	*::-webkit-scrollbar-thumb {
+		background-color: #F2DE67;
+		transition: width 2s, height 2s, background-color 2s, transform 2s;
+		-webkit-transition: width 2s, height 2s, background-color 2s, transform 2s;
+	}
+	
+	*::-webkit-scrollbar-track {
+		background-color: #808080;
+	}
+	.ui-datepicker .ui-widget .ui-widget-content .ui-helper-clearfix .ui-corner-all{
+		z-index: 9999;
+	}
+	
+	.ui-timepicker-container{ 
+	     z-index:9999 !important; 
+	}
+</style>
+</head>
+<body>
+	<div id="header" th:include="fragment/header :: header"></div>
+	<div class="container-md" id="mainForm">
+		<div class="row p-3">
+			<ul class="nav nav-tabs" id="myTab" role="tablist" sec:authorize="isAuthenticated()">
+			  <li class="nav-item" role="presentation">
+			    <button class="nav-link active" id="userInfo-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true" onclick="myInfo()">내정보</button>
+			  </li>
+			  <li class="nav-item" role="presentation" th:if="${#authorization.expression('isAdmin()')}">
+			    <button class="nav-link" id="management-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" onclick="userManagement()">사용자관리</button>
+			  </li>
+			</ul>
+			<div class="tab-content" id="myTabContent" sec:authorize="isAuthenticated()">
+			  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="userInfo-tab">
+			  	<div class="row" style="margin-top: 1%">
+				  	<div class="input-group mb-3">
+					  <span class="input-group-text" >아이디</span>
+					  <input type="text" class="form-control" aria-describedby="userEmail" readonly="readonly" id="userEmail">
+					</div>
+				  	<div class="input-group mb-3">
+					  <span class="input-group-text" >이름</span>
+					  <input type="text" class="form-control" aria-describedby="userName" id="userName">
+					</div>
+				  	<div class="input-group mb-3">
+					  <span class="input-group-text" >휴대폰</span>
+					  <input type="text" class="form-control" aria-describedby="userPhone" id="userPhone">
+					</div>
+				  	<div class="input-group mb-3">
+					  <span class="input-group-text" >권한</span>
+					  <input type="text" class="form-control" aria-describedby="userRole" readonly="readonly" id="userRole">
+					</div>
+					
+				</div>
+				<div class="row">
+					<div class="d-flex justify-content-end"><button class="btn btn-info" onclick="saveMyInfo()">저장</button></div>
+				</div>
+				
+			  </div>
+			  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="management-tab" th:if="${#authorization.expression('isAdmin()')}">
+			  	
+			  	<table class="table" style="margin-top: 1%">
+				  <thead class="table-dark" style="line-height: 35px;">
+				    <tr>
+					    <th style="width: 10%">#</th>
+					    <th style="width: 20%">이름</th>
+					    <th style="width: 25%">이메일</th>
+					    <th style="width: 25%">휴대폰</th>
+					    <th style="width: 10%">상태</th>
+					    <th style="width: 10%">권한</th>
+				    </tr>
+				  </thead>
+				  <tbody id="userList">
+				  	
+				  </tbody>
+				</table>
+				<input type="hidden" id="pageNo" name="pageNo"/>
+				<div align="center"> 
+					<nav>
+					  <ul class="pagination justify-content-sm-center">
+					    
+					  </ul>
+					</nav>
+				</div>
+			  	
+			  </div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="fragment/modal :: setUser"></div>
+	<div id="footer" th:include="fragment/footer :: footer"></div>
+	<script type="text/javascript" src="./js/bootstrap.js"></script>
+</body>
+</html>
